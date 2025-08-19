@@ -1,0 +1,72 @@
+body {
+  font-family: Arial, sans-serif;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+#resumo .card {
+  border-left: 5px solid transparent;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+#resumo .card:nth-child(1) { border-left-color: #0d6efd; }
+#resumo .card:nth-child(2) { border-left-color: #198754; }
+#resumo .card:nth-child(3) { border-left-color: #dc3545; }
+
+#resumo .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.conta-concluida {
+  background-color: #d4edda;
+  color: #155724;
+  font-weight: bold;
+  transition: background-color 0.5s ease;
+}
+
+.progress-bar {
+  background-image: none !important;
+  background-color: #dc3545;
+  transition: width 0.8s ease, background-color 0.8s ease;
+  will-change: width, background-color;
+}
+
+/* animação entrada da lista */
+.animar-entrada {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: aparecer 0.5s forwards;
+}
+
+@keyframes aparecer {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* badges categoria */
+.badge {
+  color: #fff;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+/* ícone ✓ animado */
+.concluido-icone {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%) scale(0);
+  color: #198754;
+  font-size: 1.2rem;
+  font-weight: bold;
+  opacity: 0;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.concluido-ativo {
+  transform: translateY(-50%) scale(1);
+  opacity: 1;
+}
