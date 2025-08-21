@@ -12,7 +12,7 @@ const coresCategoria = {
   transporte: "#198754",
   lazer: "#ffc107",
   divida: "#dc3545",
-  outros: "#6c757d"
+  outros: "#6c757d",
 };
 
 // carrega do localStorage
@@ -24,7 +24,7 @@ const toNumber = (v) => (typeof v === "number" ? v : parseFloat(v || 0));
 const formatBRL = (n) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n ?? 0);
 
-// animação de contagem nos cards
+// ANIMAÇÃO DE CONTAGEM NOS CARDS
 function contarValor(el, valorFinal) {
   let valorAtual = parseFloat(el.getAttribute("data-valor")) || 0;
   const passo = (valorFinal - valorAtual) / 20; // 20 frames
@@ -45,14 +45,18 @@ function contarValor(el, valorFinal) {
   animar();
 }
 
-// atualiza cards do resumo
+// ATUALIZA CARDS DO RESUMO
 function atualizarResumo() {
   const totalContasEl = document.getElementById("totalContas");
   const totalPagoEl = document.getElementById("totalPago");
   const totalRestanteEl = document.getElementById("totalRestante");
 
   const totalContas = contas.length;
-  const totalPago = contas.reduce((acc, c) => acc + (toNumber(c.valor) * (c.parcelaAtual || 0)), 0);
+  // Agora o cálculo usa o array 'pagamentos'
+  const totalPago = contas.reduce(
+    (acc, c) => acc + (c.pagamentos ? c.pagamentos.reduce((pAcc, p) => pAcc + toNumber(p.valor), 0) : 0),
+    0
+  );
   const totalRestante = contas.reduce(
     (acc, c) => acc + (toNumber(c.valor) * ((c.parcelas || 0) - (c.parcelaAtual || 0))),
     0
@@ -61,6 +65,47 @@ function atualizarResumo() {
   contarValor(totalContasEl, totalContas);
   contarValor(totalPagoEl, totalPago);
   contarValor(totalRestanteEl, totalRestante);
+}
+
+// NOVO: FUNÇÃO PARA REGISTRAR UM PAGAMENTO COM DATA
+function registrarPagamento(conta) {
+  if (!Array.isArray(conta.pagamentos)) {
+    conta.pagamentos = [];
+  }
+  conta.pagamentos.push({
+    valor: conta.valor,
+    data: new Date().toISOString(), // Registra a data e hora do pagamento
+  });
+  conta.parcelaAtual = Math.max(0, (conta.parcelaAtual || 0) + 1);
+}
+
+// NOVO: FUNÇÃO PARA MIGRAR DADOS ANTIGOS
+function migrarDadosAntigos() {
+  let dadosMigrados = false;
+  contas.forEach(conta => {
+    // Se a conta não tiver o array de pagamentos mas tiver parcelas pagas, migra.
+    if (!Array.isArray(conta.pagamentos) && (conta.parcelaAtual || 0) > 0) {
+      conta.pagamentos = [];
+      for (let i = 0; i < conta.parcelaAtual; i++) {
+        // Cria pagamentos com datas estimadas (baseado no vencimento)
+        const dataVencimento = new Date(conta.vencimento);
+        const dataMigrada = new Date(dataVencimento.getFullYear(), dataVencimento.getMonth() + i, dataVencimento.getDate());
+        conta.pagamentos.push({
+          valor: conta.valor,
+          data: dataMigrada.toISOString(),
+        });
+      }
+      dadosMigrados = true;
+    }
+    // Adiciona o array vazio para novas contas
+    if (!Array.isArray(conta.pagamentos)) {
+        conta.pagamentos = [];
+    }
+  });
+  // Salva se houve alguma mudança
+  if (dadosMigrados) {
+    salvarContas();
+  }
 }
 
 // renderiza lista
@@ -89,18 +134,22 @@ const renderizarContas = () => {
       li.classList.add("conta-concluida");
       li.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <div>${badgeCategoria}<strong>${conta.nome}</strong> - Concluído - ${formatBRL(valorParcela * parcelas)} ${vencTexto}</div>
+          <div>${badgeCategoria}<strong>${conta.nome}</strong> - Concluído - ${formatBRL(
+        valorParcela * parcelas
+      )} ${vencTexto}</div>
           <div><button class="btn btn-sm btn-danger btn-remover">Remover</button></div>
         </div>
         <div class="progress">
           <div class="progress-bar" role="progressbar"
-               style="width:100%; background:${barraClass};" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                style="width:100%; background:${barraClass};" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
       `;
     } else {
       li.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <div>${badgeCategoria}<strong>${conta.nome}</strong> - Parcela ${parcelaAtual} de ${parcelas} - ${formatBRL(valorParcela)} ${vencTexto}</div>
+          <div>${badgeCategoria}<strong>${conta.nome}</strong> - Parcela ${parcelaAtual} de ${parcelas} - ${formatBRL(
+        valorParcela
+      )} ${vencTexto}</div>
           <div>
             <button class="btn btn-sm btn-primary btn-pagar me-2">Pagar</button>
             <button class="btn btn-sm btn-warning btn-desfazer me-2">Desfazer</button>
@@ -109,7 +158,7 @@ const renderizarContas = () => {
         </div>
         <div class="progress">
           <div class="progress-bar" role="progressbar"
-               style="width:${Math.max(2, porcentagem)}%; background:${barraClass};" aria-valuenow="${porcentagem}" aria-valuemin="0" aria-valuemax="100"></div>
+                style="width:${Math.max(2, porcentagem)}%; background:${barraClass};" aria-valuenow="${porcentagem}" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
       `;
     }
@@ -118,9 +167,34 @@ const renderizarContas = () => {
     const btnDesfazer = li.querySelector(".btn-desfazer");
     const btnRemover = li.querySelector(".btn-remover");
 
-    if (btnPagar) btnPagar.addEventListener("click", () => { if (conta.parcelaAtual < conta.parcelas) { conta.parcelaAtual++; salvarContas(); renderizarContas(); }});
-    if (btnDesfazer) btnDesfazer.addEventListener("click", () => { if (conta.parcelaAtual > 0) { conta.parcelaAtual--; salvarContas(); renderizarContas(); }});
-    if (btnRemover) btnRemover.addEventListener("click", () => { if (confirm(`Remover "${conta.nome}"?`)) { contas.splice(index, 1); salvarContas(); renderizarContas(); }});
+    if (btnPagar)
+      btnPagar.addEventListener("click", () => {
+        if (contas[index].parcelaAtual < contas[index].parcelas) {
+          registrarPagamento(contas[index]);
+          salvarContas();
+          renderizarContas();
+        }
+      });
+    if (btnDesfazer)
+      btnDesfazer.addEventListener("click", () => {
+        if (contas[index].parcelaAtual > 0) {
+          contas[index].parcelaAtual--;
+          // remove o último pagamento registrado
+          if(contas[index].pagamentos && contas[index].pagamentos.length > 0) {
+            contas[index].pagamentos.pop();
+          }
+          salvarContas();
+          renderizarContas();
+        }
+      });
+    if (btnRemover)
+      btnRemover.addEventListener("click", () => {
+        if (confirm(`Remover "${contas[index].nome}"?`)) {
+          contas.splice(index, 1);
+          salvarContas();
+          renderizarContas();
+        }
+      });
 
     listaContas.appendChild(li);
     li.classList.add("animar-entrada");
@@ -142,7 +216,8 @@ btnAdicionar.addEventListener("click", () => {
     parcelas: parseInt(inputParcelas.value),
     parcelaAtual: 0,
     vencimento: inputVencimento.value,
-    categoria: inputCategoria.value || "outros"
+    categoria: inputCategoria.value || "outros",
+    pagamentos: [], // Garante que o array de pagamentos existe desde o início
   });
 
   salvarContas();
@@ -160,5 +235,5 @@ btnAdicionar.addEventListener("click", () => {
 });
 
 // renderização inicial
+migrarDadosAntigos();
 renderizarContas();
-  

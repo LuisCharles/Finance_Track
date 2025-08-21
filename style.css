@@ -1,86 +1,253 @@
 body {
-  font-family: Arial, sans-serif;
+    font-family: Arial, sans-serif;
 }
 
 /* Cards de resumo geral */
 #resumo .card {
-  border-left: 5px solid transparent;
-  transition: transform 0.2s;
+    border-left: 5px solid transparent;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 #resumo .card:hover {
-  transform: translateY(-3px);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
 }
 
 #resumo .card:nth-child(1) {
-  border-left-color: #0d6efd; /* Azul */
+    border-left-color: #0d6efd; /* Azul */
 }
 #resumo .card:nth-child(2) {
-  border-left-color: #dc3545; /* Vermelho */
+    border-left-color: #dc3545; /* Vermelho */
 }
 #resumo .card:nth-child(3) {
-  border-left-color: #198754; /* Verde */
+    border-left-color: #198754; /* Verde */
 }
 
 .card-title {
-  font-size: 1rem;
-  font-weight: 600;
+    font-size: 1rem;
+    font-weight: 600;
 }
 
-/* Alertas / Lembretes */
+/* Alertas / Lembretes - Design Moderno */
 #alertas {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
 }
 
 #alertas li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
+    padding: 0.5rem 0;
 }
 
-/* Boas-vindas */
-.my-4.text-center h1 {
-  font-size: 2rem;
-  font-weight: 700;
+.alerta-item {
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-left: 5px solid transparent;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-.my-4.text-center p.lead {
-  font-size: 1.2rem;
-  color: #555;
+.alerta-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
+
+.alerta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+}
+
+.alerta-title {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.alerta-data {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.alerta-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 0.5rem;
+    border-top: 1px dashed #eee;
+    padding-top: 0.5rem;
+}
+
+.alerta-message {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.alerta-info {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+/* Cores das Bordas dos Alertas */
+.alerta-normal {
+    border-left-color: #28a745; /* Verde */
+}
+
+.alerta-atencao {
+    border-left-color: #ffc107; /* Amarelo */
+}
+
+.alerta-urgente {
+    border-left-color: #dc3545; /* Vermelho */
+}
+
 
 /* Mini calendário semanal */
-#calendarioSemana div {
-  flex: 1;
-  padding: 10px;
-  margin: 2px;
-  border-radius: 5px;
-  background-color: #e9ecef;
+#calendarioSemana {
+    display: flex;
+    justify-content: space-between;
 }
 
-#calendarioSemana div.gasto {
-  background-color: #dc3545;
-  color: white;
+#calendarioSemana div {
+    flex: 1;
+    padding: 10px;
+    margin: 2px;
+    border-radius: 5px;
+    background-color: #e9ecef;
+    text-align: center;
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    cursor: pointer;
 }
+
+#calendarioSemana div:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Meta cor mais forte para gasto maior */
+#calendarioSemana div.gasto {
+    color: white;
+}
+
+/* Detalhes de gastos */
+#detalheGastos {
+    transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    max-height: 0;
+    opacity: 0;
+    margin-top: 1rem;
+    padding: 0 1rem;
+    overflow: hidden;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#detalheGastos.mostrar {
+    max-height: 500px; /* Valor alto para a animação */
+    opacity: 1;
+    padding: 1rem;
+}
+
+#detalheGastos h4 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+#detalheGastos ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Novo estilo para os itens da lista de gastos */
+#detalheGastos li {
+    padding: 0.5rem 0;
+}
+
+.gasto-detalhe-card {
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-left: 5px solid transparent;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.gasto-detalhe-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.gasto-detalhe-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+}
+
+.gasto-detalhe-title {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.gasto-detalhe-data {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.gasto-detalhe-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 0.5rem;
+    border-top: 1px dashed #eee;
+    padding-top: 0.5rem;
+}
+
+.gasto-detalhe-valor {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Cores das Bordas dos Cards de Detalhe (por categoria) */
+.cat-alimentacao {
+    border-left-color: #28a745; /* Verde */
+}
+.cat-transporte {
+    border-left-color: #0d6efd; /* Azul */
+}
+.cat-lazer {
+    border-left-color: #fd7e14; /* Laranja */
+}
+.cat-divida {
+    border-left-color: #dc3545; /* Vermelho */
+}
+.cat-outros {
+    border-left-color: #6c757d; /* Cinza */
+}
+
 
 /* Metas financeiras */
 #metasContainer .meta {
-  margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 #metasContainer .progress {
-  height: 20px;
+    height: 20px;
 }
 
 /* Footer */
 footer {
-  font-size: 0.9rem;
+    font-size: 0.9rem;
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
-  #resumo .card {
-    margin-bottom: 1rem;
-  }
+    #resumo .card {
+        margin-bottom: 1rem;
+    }
 }
