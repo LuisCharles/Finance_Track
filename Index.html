@@ -100,9 +100,13 @@
         </div>
 
         <div class="row mb-4">
-            <h3 class="mb-3"><i class="bi bi-pie-chart-fill"></i> Gastos por categoria</h3>
-            <div class="col-12">
-                <canvas id="graficoGastos"></canvas>
+            <h3 class="mb-3"><i class="bi bi-pie-chart-fill"></i> Gastos por Categoria</h3>
+            <div class="col-12 d-flex flex-column flex-md-row align-items-center justify-content-center">
+                <div class="grafico-container">
+                    <canvas id="graficoGastos"></canvas>
+                </div>
+                <div id="legendaCategorias" class="legenda-container mt-4 mt-md-0 ms-md-4">
+                    </div>
             </div>
         </div>
 

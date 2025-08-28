@@ -110,97 +110,106 @@ function migrarDadosAntigos() {
 
 // renderiza lista
 const renderizarContas = () => {
-  listaContas.innerHTML = "";
+    listaContas.innerHTML = "";
+    
+    // Altera a função forEach para incluir o parâmetro de índice
+    contas.forEach((conta, index) => {
+        const li = document.createElement("li");
+        li.className = "list-group-item";
 
-  contas.forEach((conta, index) => {
-    const li = document.createElement("li");
-    li.className = "list-group-item";
+        const valorParcela = toNumber(conta.valor);
+        const parcelas = conta.parcelas || 1;
+        const parcelaAtual = conta.parcelaAtual || 0;
+        const porcentagem = Math.round((parcelaAtual / parcelas) * 100);
 
-    const valorParcela = toNumber(conta.valor);
-    const parcelas = conta.parcelas || 1;
-    const parcelaAtual = conta.parcelaAtual || 0;
-    const porcentagem = Math.round((parcelaAtual / parcelas) * 100);
+        const corCategoria = coresCategoria[conta.categoria] || coresCategoria.outros;
 
-    const corCategoria = coresCategoria[conta.categoria] || coresCategoria.outros;
+        let barraClass = "#dc3545"; // vermelho
+        if (porcentagem >= 50 && porcentagem < 100) barraClass = "#ffc107"; // amarelo
+        if (porcentagem >= 100) barraClass = "#198754"; // verde
 
-    let barraClass = "#dc3545"; // vermelho
-    if (porcentagem >= 50 && porcentagem < 100) barraClass = "#ffc107"; // amarelo
-    if (porcentagem >= 100) barraClass = "#198754"; // verde
-
-    const vencTexto = conta.vencimento ? ` | Venc.: ${new Date(conta.vencimento).toLocaleDateString()}` : "";
-    const badgeCategoria = `<span class="badge" style="background:${corCategoria}; margin-right:5px">${conta.categoria}</span>`;
-
-    if (porcentagem >= 100) {
-      li.classList.add("conta-concluida");
-      li.innerHTML = `
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <div>${badgeCategoria}<strong>${conta.nome}</strong> - Concluído - ${formatBRL(
-        valorParcela * parcelas
-      )} ${vencTexto}</div>
-          <div><button class="btn btn-sm btn-danger btn-remover">Remover</button></div>
-        </div>
-        <div class="progress">
-          <div class="progress-bar" role="progressbar"
-                style="width:100%; background:${barraClass};" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-      `;
-    } else {
-      li.innerHTML = `
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <div>${badgeCategoria}<strong>${conta.nome}</strong> - Parcela ${parcelaAtual} de ${parcelas} - ${formatBRL(
-        valorParcela
-      )} ${vencTexto}</div>
-          <div>
-            <button class="btn btn-sm btn-primary btn-pagar me-2">Pagar</button>
-            <button class="btn btn-sm btn-warning btn-desfazer me-2">Desfazer</button>
-            <button class="btn btn-sm btn-danger btn-remover">Remover</button>
-          </div>
-        </div>
-        <div class="progress">
-          <div class="progress-bar" role="progressbar"
-                style="width:${Math.max(2, porcentagem)}%; background:${barraClass};" aria-valuenow="${porcentagem}" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-      `;
-    }
-
-    const btnPagar = li.querySelector(".btn-pagar");
-    const btnDesfazer = li.querySelector(".btn-desfazer");
-    const btnRemover = li.querySelector(".btn-remover");
-
-    if (btnPagar)
-      btnPagar.addEventListener("click", () => {
-        if (contas[index].parcelaAtual < contas[index].parcelas) {
-          registrarPagamento(contas[index]);
-          salvarContas();
-          renderizarContas();
+        // Lógica CORRIGIDA para a data de vencimento
+        let vencTexto = "";
+        if (conta.vencimento) {
+            const dataOriginal = new Date(conta.vencimento);
+            // Adiciona o número de parcelas pagas ao mês da data original
+            const proximoVencimento = new Date(dataOriginal.getFullYear(), dataOriginal.getMonth() + parcelaAtual, dataOriginal.getDate());
+            vencTexto = ` | Venc.: ${proximoVencimento.toLocaleDateString('pt-BR')}`;
         }
-      });
-    if (btnDesfazer)
-      btnDesfazer.addEventListener("click", () => {
-        if (contas[index].parcelaAtual > 0) {
-          contas[index].parcelaAtual--;
-          // remove o último pagamento registrado
-          if(contas[index].pagamentos && contas[index].pagamentos.length > 0) {
-            contas[index].pagamentos.pop();
-          }
-          salvarContas();
-          renderizarContas();
-        }
-      });
-    if (btnRemover)
-      btnRemover.addEventListener("click", () => {
-        if (confirm(`Remover "${contas[index].nome}"?`)) {
-          contas.splice(index, 1);
-          salvarContas();
-          renderizarContas();
-        }
-      });
+        
+        const badgeCategoria = `<span class="badge" style="background:${corCategoria}; margin-right:5px">${conta.categoria}</span>`;
 
-    listaContas.appendChild(li);
-    li.classList.add("animar-entrada");
-  });
+        if (porcentagem >= 100) {
+            li.classList.add("conta-concluida");
+            li.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>${badgeCategoria}<strong>${conta.nome}</strong> - Concluído - ${formatBRL(
+                        valorParcela * parcelas
+                    )} ${vencTexto}</div>
+                    <div><button class="btn btn-sm btn-danger btn-remover">Remover</button></div>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar"
+                        style="width:100%; background:${barraClass};" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            `;
+        } else {
+            li.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>${badgeCategoria}<strong>${conta.nome}</strong> - Parcela ${parcelaAtual + 1} de ${parcelas} - ${formatBRL(
+                        valorParcela
+                    )} ${vencTexto}</div>
+                    <div>
+                        <button class="btn btn-sm btn-primary btn-pagar me-2">Pagar</button>
+                        <button class="btn btn-sm btn-warning btn-desfazer me-2">Desfazer</button>
+                        <button class="btn btn-sm btn-danger btn-remover">Remover</button>
+                    </div>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar"
+                        style="width:${Math.max(2, porcentagem)}%; background:${barraClass};" aria-valuenow="${porcentagem}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            `;
+        }
 
-  atualizarResumo();
+        const btnPagar = li.querySelector(".btn-pagar");
+        const btnDesfazer = li.querySelector(".btn-desfazer");
+        const btnRemover = li.querySelector(".btn-remover");
+
+        if (btnPagar)
+            btnPagar.addEventListener("click", () => {
+                if (contas[index].parcelaAtual < contas[index].parcelas) {
+                    registrarPagamento(contas[index]);
+                    salvarContas();
+                    renderizarContas();
+                }
+            });
+        if (btnDesfazer)
+            btnDesfazer.addEventListener("click", () => {
+                if (contas[index].parcelaAtual > 0) {
+                    contas[index].parcelaAtual--;
+                    // remove o último pagamento registrado
+                    if(contas[index].pagamentos && contas[index].pagamentos.length > 0) {
+                        contas[index].pagamentos.pop();
+                    }
+                    salvarContas();
+                    renderizarContas();
+                }
+            });
+        if (btnRemover)
+            btnRemover.addEventListener("click", () => {
+                if (confirm(`Remover "${contas[index].nome}"?`)) {
+                    contas.splice(index, 1);
+                    salvarContas();
+                    renderizarContas();
+                }
+            });
+
+        listaContas.appendChild(li);
+        li.classList.add("animar-entrada");
+    });
+
+    atualizarResumo();
 };
 
 // adicionar nova conta
