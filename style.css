@@ -1,0 +1,373 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* Cards de resumo geral */
+#resumo .card {
+    border-left: 5px solid transparent;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+#resumo .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+#resumo .card:nth-child(1) {
+    border-left-color: #0d6efd; /* Azul para Saldo Total */
+}
+#resumo .card:nth-child(2) {
+    border-left-color: #dc3545; /* Vermelho para Gastos do Mês */
+}
+#resumo .card:nth-child(3) {
+    border-left-color: #198754; /* Verde para Entradas do Mês */
+}
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Alertas / Lembretes - Design Corrigido */
+#alertas {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+#alertas li {
+    padding: 0.5rem 0;
+}
+
+/* Contêiner principal do card */
+.alerta-item {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-left: 5px solid transparent;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-left-color 0.3s ease;
+}
+
+.alerta-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Linha superior: Tag, Título e Valor */
+.alerta-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+/* Contêiner para a tag e o título para que fiquem juntos */
+.alerta-title-group {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+/* Tag de categoria - Agora sempre visível */
+.alerta-categoria-tag {
+    font-size: 0.7em;
+    padding: 3px 8px;
+    border-radius: 50px;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-right: 10px;
+}
+
+.alerta-title {
+    font-weight: 600;
+    color: #343a40;
+    font-size: 1.1rem;
+}
+
+.alerta-valor {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #495057;
+    white-space: nowrap; /* Impede a quebra de linha do valor */
+}
+
+/* Linha inferior: Mensagem, Vencimento e Parcela */
+.alerta-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+/* Novo: Grupo à direita para vencimento e parcela */
+.alerta-right-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Alinha o texto à direita */
+    text-align: right;
+}
+
+.alerta-data {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.alerta-info {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.alerta-message {
+    font-weight: 600;
+}
+
+/* Classes para cores da borda do card */
+.alerta-normal.alerta-item {
+    border-left-color: #28a745; /* Verde */
+}
+.alerta-atencao.alerta-item {
+    border-left-color: #ffc107; /* Amarelo */
+}
+.alerta-urgente.alerta-item {
+    border-left-color: #dc3545; /* Vermelho */
+}
+.alerta-aviso.alerta-item {
+    border-left-color: #fd7e14; /* Laranja */
+}
+
+/* Classes para as tags de categoria */
+.tag-alimentacao { background-color: #28a745; }
+.tag-transporte { background-color: #0d6efd; }
+.tag-lazer { background-color: #fd7e14; }
+.tag-divida { background-color: #dc3545; }
+.tag-outros { background-color: #6c757d; }
+
+/* Classes para cores dos textos */
+.texto-vencido {
+    color: #dc3545;
+    font-weight: bold;
+}
+.texto-vence-hoje {
+    color: #ffc107;
+    font-weight: bold;
+}
+.texto-vence-breve {
+    color: #fd7e14;
+    font-weight: bold;
+}
+.texto-normal {
+    color: #28a745;
+}
+
+
+/* Mini calendário semanal */
+#calendarioSemana {
+    display: flex;
+    justify-content: space-between;
+}
+
+#calendarioSemana div {
+    flex: 1;
+    padding: 10px;
+    margin: 2px;
+    border-radius: 5px;
+    background-color: #e9ecef;
+    text-align: center;
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+#calendarioSemana div:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Meta cor mais forte para gasto maior */
+#calendarioSemana div.gasto {
+    color: white;
+}
+
+/* Detalhes de gastos */
+#detalheGastos {
+    transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+    max-height: 0;
+    opacity: 0;
+    margin-top: 1rem;
+    padding: 0 1rem;
+    overflow: hidden;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#detalheGastos.mostrar {
+    max-height: 500px; /* Valor alto para a animação */
+    opacity: 1;
+    padding: 1rem;
+}
+
+#detalheGastos h4 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+#detalheGastos ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Novo estilo para os itens da lista de gastos */
+#detalheGastos li {
+    padding: 0.5rem 0;
+}
+
+.gasto-detalhe-card {
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-left: 5px solid transparent;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.gasto-detalhe-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.gasto-detalhe-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+}
+
+.gasto-detalhe-title {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.gasto-detalhe-data {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.gasto-detalhe-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 0.5rem;
+    border-top: 1px dashed #eee;
+    padding-top: 0.5rem;
+}
+
+.gasto-detalhe-valor {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Cores das Bordas dos Cards de Detalhe (por categoria) */
+.cat-alimentacao {
+    border-left-color: #28a745; /* Verde */
+}
+.cat-transporte {
+    border-left-color: #0d6efd; /* Azul */
+}
+.cat-lazer {
+    border-left-color: #fd7e14; /* Laranja */
+}
+.cat-divida {
+    border-left-color: #dc3545; /* Vermelho */
+}
+.cat-outros {
+    border-left-color: #6c757d; /* Cinza */
+}
+
+/* Estilos para as tags de categoria */
+.tag-alimentacao { background-color: #28a745; } /* Verde */
+.tag-transporte { background-color: #0d6efd; } /* Azul */
+.tag-lazer { background-color: #fd7e14; } /* Laranja */
+.tag-divida { background-color: #dc3545; } /* Vermelho */
+.tag-outros { background-color: #6c757d; } /* Cinza */
+
+/* Estilos para o Gráfico de Pizza */
+.grafico-container {
+    position: relative;
+    width: 100%;
+    max-width: 350px; /* Reduz o tamanho do gráfico */
+    margin: auto;
+}
+
+/* Estilos para a Legenda de Categorias */
+.legenda-container {
+    width: 100%;
+    max-width: 250px; /* Largura máxima da legenda */
+    margin-top: 1rem;
+    padding: 0.5rem;
+}
+
+.legenda-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    border: 1px solid #e9ecef;
+}
+
+.legenda-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.legenda-cor {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    margin-right: 12px;
+}
+
+.legenda-nome {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #495057;
+    flex-grow: 1;
+}
+
+.legenda-valor {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #343a40;
+}
+
+/* Efeito de inatividade para a legenda */
+.legenda-item.inativo {
+    opacity: 0.6;
+    background-color: #f8f9fa;
+    transform: none;
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+/* Footer */
+footer {
+    font-size: 0.9rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    #resumo .card {
+        margin-bottom: 1rem;
+    }
+}
