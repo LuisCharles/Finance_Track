@@ -28,6 +28,8 @@ body {
     font-weight: 600;
 }
 
+/* --- */
+
 /* Alertas / Lembretes - Design Corrigido */
 #alertas {
     list-style: none;
@@ -165,6 +167,7 @@ body {
     color: #28a745;
 }
 
+/* --- */
 
 /* Mini calendário semanal */
 #calendarioSemana {
@@ -191,6 +194,11 @@ body {
 /* Meta cor mais forte para gasto maior */
 #calendarioSemana div.gasto {
     color: white;
+}
+#calendarioSemana div.semana-ativa {
+    border: 2px solid #0d6efd;
+    background-color: #0d6efd !important;
+    color: white !important;
 }
 
 /* Detalhes de gastos */
@@ -292,25 +300,16 @@ body {
     border-left-color: #6c757d; /* Cinza */
 }
 
-/* Estilos para as tags de categoria */
-.tag-alimentacao { background-color: #28a745; } /* Verde */
-.tag-transporte { background-color: #0d6efd; } /* Azul */
-.tag-lazer { background-color: #fd7e14; } /* Laranja */
-.tag-divida { background-color: #dc3545; } /* Vermelho */
-.tag-outros { background-color: #6c757d; } /* Cinza */
-
 /* Estilos para o Gráfico de Pizza */
-.grafico-container {
-    position: relative;
-    width: 100%;
-    max-width: 350px; /* Reduz o tamanho do gráfico */
-    margin: auto;
+#graficoGastos {
+    height: 300px; /* Define uma altura máxima para evitar o bug do scroll */
+    max-height: 300px;
+    width: 100% !important; /* Garante que o gráfico se ajuste à largura */
 }
 
 /* Estilos para a Legenda de Categorias */
-.legenda-container {
+.legenda {
     width: 100%;
-    max-width: 250px; /* Largura máxima da legenda */
     margin-top: 1rem;
     padding: 0.5rem;
 }
@@ -369,5 +368,9 @@ footer {
 @media (max-width: 768px) {
     #resumo .card {
         margin-bottom: 1rem;
+    }
+    #graficoGastos {
+        height: 250px;
+        max-height: 250px;
     }
 }

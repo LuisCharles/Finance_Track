@@ -1,143 +1,16 @@
 "use strict";
 
 // =========================
-// Helpers / Fonte de dados
+// Funções da página Home
 // =========================
+let graficoPizza;
 
-function obterContas() {
-    try {
-        const raw = localStorage.getItem("contas");
-        if (!raw) return [];
-        const data = JSON.parse(raw);
-        return Array.isArray(data) ? data : [];
-    } catch (e) {
-        console.warn("[obterContas] JSON inválido em localStorage.contas.", e);
-        return [];
-    }
-}
-
-function salvarContas(contas) {
-    try {
-        localStorage.setItem("contas", JSON.stringify(contas ?? []));
-        // Dispara o evento 'storage' para notificar outras abas
-        window.dispatchEvent(new Event('storage'));
-    } catch (e) {
-        console.error("[salvarContas] Falha ao salvar contas.", e);
-    }
-}
-
-// Formata em BRL
-const formatBRL = (n) =>
-    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
-        Number.isFinite(n) ? n : 0
-    );
-
-// Converte com segurança para número (aceita "1.234,56" ou "1234.56")
-function toNumber(v) {
-    if (typeof v === "number") return Number.isFinite(v) ? v : 0;
-    if (v == null) return 0;
-    const s = String(v).trim();
-    const norm = s.replace(/\./g, "").replace(/,/g, ".");
-    const n = parseFloat(norm);
-    return Number.isFinite(n) ? n : 0;
-}
-
-// Anima números nos cards (suave, sem “pulos” após refresh)
-function animarNumero(el, valorFinal, formatFn = (v) => v, duracaoMs = 500) {
-    if (!el) return;
-    const ini = performance.now();
-    const valorInicial = parseFloat(el.getAttribute("data-valor") || 0) || 0;
-
-    if (valorInicial === valorFinal) {
-        el.textContent = formatFn(valorFinal);
-        el.setAttribute("data-valor", String(valorFinal));
-        return;
-    }
-
-    function step(t) {
-        const p = Math.min(1, (t - ini) / duracaoMs);
-        const atual = valorInicial + (valorFinal - valorInicial) * p;
-        el.textContent = formatFn(atual);
-        if (p < 1) {
-            requestAnimationFrame(step);
-        } else {
-            el.textContent = formatFn(valorFinal);
-            el.setAttribute("data-valor", String(valorFinal));
-        }
-    }
-    requestAnimationFrame(step);
-}
-
-function semanaDoMes(date = new Date()) {
-    const dia = date.getDate();
-    return Math.min(5, Math.max(1, Math.ceil(dia / 7)));
-}
-
-const coresCategoria = {
-    alimentacao: "#28a745", // Verde
-    transporte: "#0d6efd", // Azul
-    lazer: "#fd7e14", // Laranja
-    divida: "#dc3545", // Vermelho
-    outros: "#6c757d", // Cinza
-};
-
-// =========================
-// Datas
-// =========================
-function parseDataBr(str) {
-    if (typeof str !== "string") return null;
-    const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
-    if (!m) return null;
-    let [, d, mo, y] = m;
-    if (y.length === 2) y = "20" + y;
-    const dt = new Date(+y, +mo - 1, +d);
-    return Number.isFinite(dt.getTime()) ? dt : null;
-}
-
-function parseDataFlex(v) {
-    if (!v) return null;
-    if (v instanceof Date) return v;
-
-    // Trata a string de data adicionando T00:00:00
-    if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) {
-        const d = new Date(`${v}T00:00:00`);
-        return Number.isFinite(d.getTime()) ? d : null;
-    }
-
-    const br = parseDataBr(v);
-    if (br) return br;
-    const d = new Date(v);
-    return Number.isNaN(d.getTime()) ? null : d;
-}
-
-// =========================
-// Obtém todos os pagamentos de um mês
-// =========================
-function obterPagamentosDoMes(contas, ano, mes) {
-    const pagamentosDoMes = [];
-    contas.forEach((conta) => {
-        if (Array.isArray(conta.pagamentos) && conta.pagamentos.length) {
-            conta.pagamentos.forEach((pag) => {
-                const dt = parseDataFlex(pag.data);
-                if (dt && dt.getFullYear() === ano && dt.getMonth() === mes) {
-                    pagamentosDoMes.push({ conta: conta, valor: toNumber(pag.valor), data: dt });
-                }
-            });
-        }
-    });
-    return pagamentosDoMes;
-}
-
-// =========================
-// Resumo (cards do topo)
-// =========================
 function atualizarResumoHome() {
     const contas = obterContas();
     const saldoTotalEl = document.getElementById("saldoTotal");
     const gastosMesEl = document.getElementById("gastosMes");
     const entradasMesEl = document.getElementById("entradasMes");
     const alertasEl = document.getElementById("alertas");
-    // Removido: const proximasContasEl = document.getElementById("proximasContas");
 
     const hoje = new Date();
     const anoAtual = hoje.getFullYear();
@@ -146,10 +19,10 @@ function atualizarResumoHome() {
     const anoProximoMes = (mesAtual === 11) ? anoAtual + 1 : anoAtual;
 
     const pagamentos = obterPagamentosDoMes(contas, anoAtual, mesAtual);
-    let gastosDoMes = pagamentos.reduce((acc, p) => acc + p.valor, 0);
+    const gastosDoMes = pagamentos.reduce((acc, p) => acc + p.valor, 0);
 
-    const saldoTotal = 0;
-    const entradasMes = 0;
+    const saldoTotal = 0; // Você precisa implementar a lógica para o saldo total
+    const entradasMes = 0; // Você precisa implementar a lógica para as entradas
 
     if (saldoTotalEl) animarNumero(saldoTotalEl, saldoTotal, formatBRL);
     if (gastosMesEl) animarNumero(gastosMesEl, gastosDoMes, formatBRL);
@@ -168,7 +41,7 @@ function atualizarResumoHome() {
             vencimentoParcela.setMonth(dataVencimento.getMonth() + (c.parcelaAtual || 0));
 
             const estaNoMesAtual = vencimentoParcela.getFullYear() === anoAtual && vencimentoParcela.getMonth() === mesAtual;
-
+            
             const pagaNesteMes = (c.pagamentos || []).some(pag => {
                 const dataPagamento = parseDataFlex(pag.data);
                 return dataPagamento && dataPagamento.getFullYear() === anoAtual && dataPagamento.getMonth() === mesAtual;
@@ -251,18 +124,22 @@ function atualizarResumoHome() {
             });
         }
         
-        // Adiciona um separador se houver contas futuras
+        // CORRIGIDO: Esta parte agora é independente da seção acima
         const contasProximoMes = contas.filter(c => {
             const dataVencimento = parseDataFlex(c.vencimento);
             if (!dataVencimento) return false;
 
-            const proximaParcela = c.parcelaAtual + 1;
-            if (proximaParcela > c.parcelas) {
+            // Para exibir as próximas contas, consideramos a parcela já paga (c.parcelaAtual)
+            // e verificamos a data da parcela seguinte (c.parcelaAtual + 1)
+            const proximaParcelaIndex = c.parcelaAtual;
+            
+            // Se já pagou todas as parcelas, não tem próxima
+            if (proximaParcelaIndex >= c.parcelas) {
                 return false;
             }
 
             const vencimentoProximaParcela = new Date(dataVencimento);
-            vencimentoProximaParcela.setMonth(dataVencimento.getMonth() + proximaParcela);
+            vencimentoProximaParcela.setMonth(dataVencimento.getMonth() + proximaParcelaIndex);
 
             return vencimentoProximaParcela.getFullYear() === anoProximoMes && vencimentoProximaParcela.getMonth() === proximoMes;
         });
@@ -278,7 +155,7 @@ function atualizarResumoHome() {
                 if (!dataVencimento) return;
 
                 const vencimentoProximaParcela = new Date(dataVencimento);
-                vencimentoProximaParcela.setMonth(dataVencimento.getMonth() + (c.parcelaAtual + 1));
+                vencimentoProximaParcela.setMonth(dataVencimento.getMonth() + (c.parcelaAtual));
 
                 const dataFormatada = vencimentoProximaParcela.toLocaleDateString('pt-BR');
                 const categoriaDisplay = c.categoria ? c.categoria.charAt(0).toUpperCase() + c.categoria.slice(1) : 'Outros';
@@ -299,7 +176,7 @@ function atualizarResumoHome() {
                             <span class="alerta-message texto-normal">A conta vence no próximo mês.</span>
                             <div class="alerta-right-group">
                                 <span class="alerta-data texto-normal">Vencimento: ${dataFormatada}</span>
-                                <span class="alerta-info">Parcela ${c.parcelaAtual + 2} de ${c.parcelas}</span>
+                                <span class="alerta-info">Parcela ${c.parcelaAtual + 1} de ${c.parcelas}</span>
                             </div>
                         </div>
                     </div>
@@ -310,16 +187,13 @@ function atualizarResumoHome() {
     }
 }
 
-
-// =========================
-// Novo: Renderiza os detalhes de gastos semanais
-// =========================
 function renderizarDetalheGastos(semana, pagamentos) {
     const detalheEl = document.getElementById("detalheGastos");
     if (!detalheEl) return;
 
     detalheEl.innerHTML = `<h4>Gastos da Semana ${semana}</h4>`;
     const ul = document.createElement("ul");
+    ul.className = 'list-unstyled';
 
     if (pagamentos.length > 0) {
         pagamentos.forEach(pag => {
@@ -329,7 +203,6 @@ function renderizarDetalheGastos(semana, pagamentos) {
 
             const categoria = pag.conta.categoria || 'outros';
             const categoriaClass = `cat-${categoria}`;
-            const tagClass = `tag-${categoria}`;
             const categoriaDisplay = categoria.charAt(0).toUpperCase() + categoria.slice(1);
 
             li.innerHTML = `
@@ -352,13 +225,10 @@ function renderizarDetalheGastos(semana, pagamentos) {
         li.className = "text-muted text-center py-3";
         ul.appendChild(li);
     }
-
     detalheEl.appendChild(ul);
 }
 
-// =========================
-// Mini calendário semanal
-// =========================
+
 function atualizarCalendarioSemana() {
     const contas = obterContas();
     const calendarioEl = document.getElementById("calendarioSemana");
@@ -383,6 +253,7 @@ function atualizarCalendarioSemana() {
     calendarioEl.innerHTML = "";
 
     const detalheEl = document.getElementById("detalheGastos");
+    if (detalheEl) detalheEl.innerHTML = '';
     let semanaAtiva = -1;
 
     for (let i = 0; i < semanas; i++) {
@@ -395,7 +266,7 @@ function atualizarCalendarioSemana() {
         div.style.textAlign = "center";
         div.setAttribute("data-semana", i + 1);
 
-        div.textContent = `Semana ${i + 1}\n${formatBRL(valorPorSemana[i])}`;
+        div.innerHTML = `Semana ${i + 1}<br/>${formatBRL(valorPorSemana[i])}`;
 
         if (valorPorSemana[i] > 0) {
             div.classList.add("gasto");
@@ -410,15 +281,20 @@ function atualizarCalendarioSemana() {
         div.addEventListener("click", () => {
             const semanaClicada = i + 1;
 
+            document.querySelectorAll(".semana-card").forEach(el => el.classList.remove("semana-ativa"));
+            
             if (semanaAtiva === semanaClicada) {
-                // Clicou na mesma semana: esconde
-                detalheEl.classList.remove("mostrar");
+                // Remove o conteúdo do detalhe
+                if (detalheEl) {
+                    detalheEl.classList.remove("mostrar");
+                    detalheEl.innerHTML = '';
+                }
                 semanaAtiva = -1;
             } else {
-                // Clicou em uma nova semana: mostra
                 renderizarDetalheGastos(semanaClicada, pagamentosPorSemana[semanaClicada - 1]);
-                detalheEl.classList.add("mostrar");
+                if (detalheEl) detalheEl.classList.add("mostrar");
                 semanaAtiva = semanaClicada;
+                div.classList.add("semana-ativa");
             }
         });
 
@@ -426,10 +302,7 @@ function atualizarCalendarioSemana() {
     }
 }
 
-// =========================
-// Gráfico pizza (Chart.js)
-// =========================
-let graficoPizza;
+
 function atualizarGrafico() {
     const ctx = document.getElementById("graficoGastos");
     const legendaEl = document.getElementById("legendaCategorias");
@@ -455,18 +328,15 @@ function atualizarGrafico() {
 
     const labels = ["Alimentação", "Transporte", "Lazer", "Dívida", "Outros"];
     const keys = ["alimentacao", "transporte", "lazer", "divida", "outros"];
-    const data = keys.map((k) => somaPorCategoria[k]);
     const colors = keys.map((k) => coresCategoria[k]);
 
-    // Filtra categorias com valor 0 para não mostrar no gráfico e na legenda
-    const dadosFiltrados = data.map((v, i) => ({
+    const dadosFiltrados = keys.map((k, i) => ({
         label: labels[i],
-        key: keys[i],
-        valor: v,
+        key: k,
+        valor: somaPorCategoria[k],
         cor: colors[i],
     })).filter(item => item.valor > 0);
 
-    // Se não há dados, mostra mensagem
     if (dadosFiltrados.length === 0) {
         ctx.style.display = 'none';
         legendaEl.innerHTML = '<p class="text-center text-muted">Nenhum gasto registrado neste mês.</p>';
@@ -494,14 +364,13 @@ function atualizarGrafico() {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    display: false, // Esconde a legenda padrão do Chart.js
+                    display: false,
                 },
             },
         },
     });
 
-    // Renderiza a legenda customizada
-    legendaEl.innerHTML = ""; // Limpa a legenda antiga
+    legendaEl.innerHTML = "";
     dadosFiltrados.forEach((item, index) => {
         const div = document.createElement("div");
         div.className = "legenda-item";
@@ -514,7 +383,7 @@ function atualizarGrafico() {
         div.addEventListener("click", () => {
             const meta = graficoPizza.getDatasetMeta(0);
             const dataPonto = meta.data[index];
-            dataPonto.hidden = !dataPonto.hidden; // Alterna a visibilidade
+            dataPonto.hidden = !dataPonto.hidden;
             div.classList.toggle("inativo", dataPonto.hidden);
             graficoPizza.update();
         });
@@ -536,193 +405,10 @@ function atualizarHome() {
     }
 }
 
-window.atualizarHome = atualizarHome;
-
 document.addEventListener("DOMContentLoaded", atualizarHome);
 
 window.addEventListener("storage", (event) => {
     if (event.key === "contas") {
         atualizarHome();
     }
-});
-
-// =========================
-// FUNÇÃO DE RENDERIZAÇÃO DA PÁGINA DE MOVIMENTAÇÕES
-// =========================
-const renderizarContas = () => {
-    const listaContas = document.getElementById("listaContas");
-    if (!listaContas) return;
-
-    let contas = obterContas();
-    listaContas.innerHTML = "";
-
-    contas.forEach((conta, index) => {
-        const li = document.createElement("li");
-        li.className = "list-group-item";
-
-        const valorParcela = toNumber(conta.valor);
-        const parcelas = conta.parcelas || 1;
-        const parcelaAtual = conta.parcelaAtual || 0;
-        const porcentagem = Math.round((parcelaAtual / parcelas) * 100);
-
-        const corCategoria = coresCategoria[conta.categoria] || coresCategoria.outros;
-
-        let barraClass = "#dc3545"; // vermelho
-        if (porcentagem >= 50 && porcentagem < 100) barraClass = "#ffc107"; // amarelo
-        if (porcentagem >= 100) barraClass = "#198754"; // verde
-
-        let vencTexto = "";
-        if (conta.vencimento) {
-            const dataOriginal = parseDataFlex(conta.vencimento);
-            if(dataOriginal) {
-                // CORREÇÃO: Usa setMonth para garantir que a data não mude com a troca de mês
-                const proximoVencimento = new Date(dataOriginal);
-                proximoVencimento.setMonth(dataOriginal.getMonth() + parcelaAtual);
-                vencTexto = ` | Venc.: ${proximoVencimento.toLocaleDateString('pt-BR')}`;
-            }
-        }
-
-        const badgeCategoria = `<span class="badge" style="background:${corCategoria}; margin-right:5px">${conta.categoria}</span>`;
-
-        if (porcentagem >= 100) {
-            li.classList.add("conta-concluida");
-            li.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div>${badgeCategoria}<strong>${conta.nome}</strong> - Concluído - ${formatBRL(
-                        valorParcela * parcelas
-                    )} ${vencTexto}</div>
-                    <div><button class="btn btn-sm btn-danger btn-remover">Remover</button></div>
-                </div>
-                <div class="progress">
-                    <div class="progress-bar" role="progressbar"
-                        style="width:100%; background:${barraClass};" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-            `;
-        } else {
-            li.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div>${badgeCategoria}<strong>${conta.nome}</strong> - Parcela ${parcelaAtual + 1} de ${parcelas} - ${formatBRL(
-                        valorParcela
-                    )} ${vencTexto}</div>
-                    <div>
-                        <button class="btn btn-sm btn-primary btn-pagar me-2">Pagar</button>
-                        <button class="btn btn-sm btn-warning btn-desfazer me-2">Desfazer</button>
-                        <button class="btn btn-sm btn-danger btn-remover">Remover</button>
-                    </div>
-                </div>
-                <div class="progress">
-                    <div class="progress-bar" role="progressbar"
-                        style="width:${Math.max(2, porcentagem)}%; background:${barraClass};" aria-valuenow="${porcentagem}" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-            `;
-        }
-
-        const btnPagar = li.querySelector(".btn-pagar");
-        const btnDesfazer = li.querySelector(".btn-desfazer");
-        const btnRemover = li.querySelector(".btn-remover");
-
-        if (btnPagar)
-            btnPagar.addEventListener("click", () => {
-                let contas = obterContas();
-                if (contas[index].parcelaAtual < contas[index].parcelas) {
-                    registrarPagamento(contas[index]);
-                    salvarContas(contas);
-                    renderizarContas();
-                }
-            });
-        if (btnDesfazer)
-            btnDesfazer.addEventListener("click", () => {
-                let contas = obterContas();
-                if (contas[index].parcelaAtual > 0) {
-                    contas[index].parcelaAtual--;
-                    // remove o último pagamento registrado
-                    if(contas[index].pagamentos && contas[index].pagamentos.length > 0) {
-                        contas[index].pagamentos.pop();
-                    }
-                    salvarContas(contas);
-                    renderizarContas();
-                }
-            });
-        if (btnRemover)
-            btnRemover.addEventListener("click", () => {
-                if (confirm(`Remover "${contas[index].nome}"?`)) {
-                    contas.splice(index, 1);
-                    salvarContas(contas);
-                    renderizarContas();
-                }
-            });
-
-        listaContas.appendChild(li);
-        li.classList.add("animar-entrada");
-    });
-    atualizarResumo(); // Chame a função de atualização do resumo da página de movimentações
-};
-
-function atualizarResumo() {
-    const contas = obterContas();
-    const totalContasEl = document.getElementById("totalContas");
-    const totalPagoEl = document.getElementById("totalPago");
-    const totalRestanteEl = document.getElementById("totalRestante");
-
-    const totalContas = contas.length;
-    const totalPago = contas.reduce(
-        (acc, c) => acc + (c.pagamentos ? c.pagamentos.reduce((pAcc, p) => pAcc + toNumber(p.valor), 0) : 0),
-        0
-    );
-    const totalRestante = contas.reduce(
-        (acc, c) => acc + (toNumber(c.valor) * ((c.parcelas || 0) - (c.parcelaAtual || 0))),
-        0
-    );
-
-    if (totalContasEl) animarNumero(totalContasEl, totalContas, Math.round);
-    if (totalPagoEl) animarNumero(totalPagoEl, totalPago, formatBRL);
-    if (totalRestanteEl) animarNumero(totalRestanteEl, totalRestante, formatBRL);
-}
-
-// NOVO: FUNÇÃO PARA REGISTRAR UM PAGAMENTO COM DATA
-function registrarPagamento(conta) {
-  if (!Array.isArray(conta.pagamentos)) {
-    conta.pagamentos = [];
-  }
-  conta.pagamentos.push({
-    valor: conta.valor,
-    data: new Date().toISOString(), // Registra a data e hora do pagamento
-  });
-  conta.parcelaAtual = Math.max(0, (conta.parcelaAtual || 0) + 1);
-}
-
-// NOVO: FUNÇÃO PARA MIGRAR DADOS ANTIGOS
-function migrarDadosAntigos() {
-  let dadosMigrados = false;
-  let contas = obterContas();
-  contas.forEach(conta => {
-    // Se a conta não tiver o array de pagamentos mas tiver parcelas pagas, migra.
-    if (!Array.isArray(conta.pagamentos) && (conta.parcelaAtual || 0) > 0) {
-      conta.pagamentos = [];
-      for (let i = 0; i < conta.parcelaAtual; i++) {
-        const dataVencimento = parseDataFlex(conta.vencimento);
-        if (!dataVencimento) continue;
-        const dataMigrada = new Date(dataVencimento);
-        dataMigrada.setMonth(dataMigrada.getMonth() + i);
-        conta.pagamentos.push({
-          valor: conta.valor,
-          data: dataMigrada.toISOString(),
-        });
-      }
-      dadosMigrados = true;
-    }
-    // Adiciona o array vazio para novas contas
-    if (!Array.isArray(conta.pagamentos)) {
-        conta.pagamentos = [];
-    }
-  });
-  // Salva se houve alguma mudança
-  if (dadosMigrados) {
-    salvarContas(contas);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    migrarDadosAntigos();
-    renderizarContas();
 });

@@ -1,3 +1,5 @@
+"use strict";
+
 const listaContas = document.getElementById("listaContas");
 const inputNome = document.getElementById("nomeConta");
 const inputValor = document.getElementById("valorConta");
@@ -6,113 +8,35 @@ const inputVencimento = document.getElementById("vencimentoConta");
 const inputCategoria = document.getElementById("categoriaConta");
 const btnAdicionar = document.getElementById("adicionarConta");
 
-// cores por categoria
-const coresCategoria = {
-  alimentacao: "#0d6efd",
-  transporte: "#198754",
-  lazer: "#ffc107",
-  divida: "#dc3545",
-  outros: "#6c757d",
-};
-
-// carrega do localStorage
-let contas = JSON.parse(localStorage.getItem("contas")) || [];
-
-// helpers
-const salvarContas = () => localStorage.setItem("contas", JSON.stringify(contas));
-const toNumber = (v) => (typeof v === "number" ? v : parseFloat(v || 0));
-const formatBRL = (n) =>
-  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n ?? 0);
-
-// ANIMAÇÃO DE CONTAGEM NOS CARDS
-function contarValor(el, valorFinal) {
-  let valorAtual = parseFloat(el.getAttribute("data-valor")) || 0;
-  const passo = (valorFinal - valorAtual) / 20; // 20 frames
-  let count = 0;
-
-  function animar() {
-    if (count < 20) {
-      valorAtual += passo;
-      el.textContent = el.id === "totalContas" ? Math.round(valorAtual) : formatBRL(valorAtual);
-      count++;
-      requestAnimationFrame(animar);
-    } else {
-      el.textContent = el.id === "totalContas" ? valorFinal : formatBRL(valorFinal);
-      el.setAttribute("data-valor", valorFinal);
-    }
-  }
-
-  animar();
-}
-
 // ATUALIZA CARDS DO RESUMO
 function atualizarResumo() {
-  const totalContasEl = document.getElementById("totalContas");
-  const totalPagoEl = document.getElementById("totalPago");
-  const totalRestanteEl = document.getElementById("totalRestante");
+    const contas = obterContas();
+    const totalContasEl = document.getElementById("totalContas");
+    const totalPagoEl = document.getElementById("totalPago");
+    const totalRestanteEl = document.getElementById("totalRestante");
 
-  const totalContas = contas.length;
-  // Agora o cálculo usa o array 'pagamentos'
-  const totalPago = contas.reduce(
-    (acc, c) => acc + (c.pagamentos ? c.pagamentos.reduce((pAcc, p) => pAcc + toNumber(p.valor), 0) : 0),
-    0
-  );
-  const totalRestante = contas.reduce(
-    (acc, c) => acc + (toNumber(c.valor) * ((c.parcelas || 0) - (c.parcelaAtual || 0))),
-    0
-  );
+    const totalContas = contas.length;
+    const totalPago = contas.reduce(
+        (acc, c) => acc + (c.pagamentos ? c.pagamentos.reduce((pAcc, p) => pAcc + toNumber(p.valor), 0) : 0),
+        0
+    );
+    const totalRestante = contas.reduce(
+        (acc, c) => acc + (toNumber(c.valor) * ((c.parcelas || 0) - (c.parcelaAtual || 0))),
+        0
+    );
 
-  contarValor(totalContasEl, totalContas);
-  contarValor(totalPagoEl, totalPago);
-  contarValor(totalRestanteEl, totalRestante);
-}
-
-// NOVO: FUNÇÃO PARA REGISTRAR UM PAGAMENTO COM DATA
-function registrarPagamento(conta) {
-  if (!Array.isArray(conta.pagamentos)) {
-    conta.pagamentos = [];
-  }
-  conta.pagamentos.push({
-    valor: conta.valor,
-    data: new Date().toISOString(), // Registra a data e hora do pagamento
-  });
-  conta.parcelaAtual = Math.max(0, (conta.parcelaAtual || 0) + 1);
-}
-
-// NOVO: FUNÇÃO PARA MIGRAR DADOS ANTIGOS
-function migrarDadosAntigos() {
-  let dadosMigrados = false;
-  contas.forEach(conta => {
-    // Se a conta não tiver o array de pagamentos mas tiver parcelas pagas, migra.
-    if (!Array.isArray(conta.pagamentos) && (conta.parcelaAtual || 0) > 0) {
-      conta.pagamentos = [];
-      for (let i = 0; i < conta.parcelaAtual; i++) {
-        // Cria pagamentos com datas estimadas (baseado no vencimento)
-        const dataVencimento = new Date(conta.vencimento);
-        const dataMigrada = new Date(dataVencimento.getFullYear(), dataVencimento.getMonth() + i, dataVencimento.getDate());
-        conta.pagamentos.push({
-          valor: conta.valor,
-          data: dataMigrada.toISOString(),
-        });
-      }
-      dadosMigrados = true;
-    }
-    // Adiciona o array vazio para novas contas
-    if (!Array.isArray(conta.pagamentos)) {
-        conta.pagamentos = [];
-    }
-  });
-  // Salva se houve alguma mudança
-  if (dadosMigrados) {
-    salvarContas();
-  }
+    if (totalContasEl) animarNumero(totalContasEl, totalContas, Math.round);
+    if (totalPagoEl) animarNumero(totalPagoEl, totalPago, formatBRL);
+    if (totalRestanteEl) animarNumero(totalRestanteEl, totalRestante, formatBRL);
 }
 
 // renderiza lista
 const renderizarContas = () => {
+    const contas = obterContas();
+    if (!listaContas) return;
+
     listaContas.innerHTML = "";
-    
-    // Altera a função forEach para incluir o parâmetro de índice
+
     contas.forEach((conta, index) => {
         const li = document.createElement("li");
         li.className = "list-group-item";
@@ -128,15 +52,16 @@ const renderizarContas = () => {
         if (porcentagem >= 50 && porcentagem < 100) barraClass = "#ffc107"; // amarelo
         if (porcentagem >= 100) barraClass = "#198754"; // verde
 
-        // Lógica CORRIGIDA para a data de vencimento
         let vencTexto = "";
         if (conta.vencimento) {
-            const dataOriginal = new Date(conta.vencimento);
-            // Adiciona o número de parcelas pagas ao mês da data original
-            const proximoVencimento = new Date(dataOriginal.getFullYear(), dataOriginal.getMonth() + parcelaAtual, dataOriginal.getDate());
-            vencTexto = ` | Venc.: ${proximoVencimento.toLocaleDateString('pt-BR')}`;
+            const dataOriginal = parseDataFlex(conta.vencimento);
+            if (dataOriginal) {
+                const proximoVencimento = new Date(dataOriginal);
+                proximoVencimento.setMonth(dataOriginal.getMonth() + parcelaAtual);
+                vencTexto = ` | Venc.: ${proximoVencimento.toLocaleDateString('pt-BR')}`;
+            }
         }
-        
+
         const badgeCategoria = `<span class="badge" style="background:${corCategoria}; margin-right:5px">${conta.categoria}</span>`;
 
         if (porcentagem >= 100) {
@@ -178,21 +103,22 @@ const renderizarContas = () => {
 
         if (btnPagar)
             btnPagar.addEventListener("click", () => {
+                let contas = obterContas();
                 if (contas[index].parcelaAtual < contas[index].parcelas) {
                     registrarPagamento(contas[index]);
-                    salvarContas();
+                    salvarContas(contas);
                     renderizarContas();
                 }
             });
         if (btnDesfazer)
             btnDesfazer.addEventListener("click", () => {
+                let contas = obterContas();
                 if (contas[index].parcelaAtual > 0) {
                     contas[index].parcelaAtual--;
-                    // remove o último pagamento registrado
                     if(contas[index].pagamentos && contas[index].pagamentos.length > 0) {
                         contas[index].pagamentos.pop();
                     }
-                    salvarContas();
+                    salvarContas(contas);
                     renderizarContas();
                 }
             });
@@ -200,7 +126,7 @@ const renderizarContas = () => {
             btnRemover.addEventListener("click", () => {
                 if (confirm(`Remover "${contas[index].nome}"?`)) {
                     contas.splice(index, 1);
-                    salvarContas();
+                    salvarContas(contas);
                     renderizarContas();
                 }
             });
@@ -208,41 +134,50 @@ const renderizarContas = () => {
         listaContas.appendChild(li);
         li.classList.add("animar-entrada");
     });
-
     atualizarResumo();
 };
 
 // adicionar nova conta
 btnAdicionar.addEventListener("click", () => {
-  if (!inputNome.value || !inputValor.value || !inputParcelas.value || !inputVencimento.value) {
-    alert("Preencha todos os campos corretamente.");
-    return;
-  }
+    if (!inputNome.value || !inputValor.value || !inputParcelas.value || !inputVencimento.value) {
+        alert("Preencha todos os campos corretamente.");
+        return;
+    }
 
-  contas.push({
-    nome: inputNome.value.trim(),
-    valor: parseFloat(inputValor.value),
-    parcelas: parseInt(inputParcelas.value),
-    parcelaAtual: 0,
-    vencimento: inputVencimento.value,
-    categoria: inputCategoria.value || "outros",
-    pagamentos: [], // Garante que o array de pagamentos existe desde o início
-  });
+    const contas = obterContas();
+    contas.push({
+        nome: inputNome.value.trim(),
+        valor: parseFloat(inputValor.value),
+        parcelas: parseInt(inputParcelas.value),
+        parcelaAtual: 0,
+        vencimento: inputVencimento.value,
+        categoria: inputCategoria.value || "outros",
+        pagamentos: [],
+    });
 
-  salvarContas();
-  renderizarContas();
+    salvarContas(contas);
+    renderizarContas();
 
-  inputNome.value = "";
-  inputValor.value = "";
-  inputParcelas.value = "";
-  inputVencimento.value = "";
-  inputCategoria.value = "alimentacao";
+    inputNome.value = "";
+    inputValor.value = "";
+    inputParcelas.value = "";
+    inputVencimento.value = "";
+    inputCategoria.value = "alimentacao";
 
-  const modalElement = document.getElementById("modalConta");
-  const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-  modal.hide();
+    const modalElement = document.getElementById("modalConta");
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+    modal.hide();
 });
 
 // renderização inicial
-migrarDadosAntigos();
-renderizarContas();
+document.addEventListener("DOMContentLoaded", () => {
+    migrarDadosAntigos();
+    renderizarContas();
+});
+
+// Sincroniza com outras abas
+window.addEventListener("storage", (event) => {
+    if (event.key === "contas") {
+        renderizarContas();
+    }
+});
