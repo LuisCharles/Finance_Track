@@ -12,8 +12,11 @@ const legendaContainer = document.getElementById("legendaCategorias");
 let graficoPizza = null;
 
 // --- Helpers ---
-const toNumber = window.toNumber || ((v)=>Number(v)||0);
-const formatBRL = window.formatBRL || ((v)=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}));
+const toNumber = window.toNumber || ((v) => Number(v) || 0);
+const formatBRL = window.formatBRL || ((v) => v.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+}));
 const coresCategoria = window.coresCategoria || {
     alimentacao: "#28a745",
     lazer: "#fd7e14",
@@ -21,10 +24,10 @@ const coresCategoria = window.coresCategoria || {
     divida: "#dc3545",
     outros: "#6c757d"
 };
-const obterContas = window.obterContas || (()=>[]);
-const obterGanhos = window.obterGanhos || (()=>[]);
-const calcularSaldoTotal = window.calcularSaldoTotal || (()=>0);
-const semanaDoMes = window.semanaDoMes || ((d)=>Math.ceil(d.getDate()/7));
+const obterContas = window.obterContas || (() => []);
+const obterGanhos = window.obterGanhos || (() => []);
+const calcularSaldoTotal = window.calcularSaldoTotal || (() => 0);
+const semanaDoMes = window.semanaDoMes || ((d) => Math.ceil(d.getDate() / 7));
 
 // --- Parse flexível ---
 function parseDataFlexSafe(d) {
@@ -65,18 +68,19 @@ function calcularEntradaDoMesSeguro() {
 function diasParaVencimento(vencimento) {
     const hoje = new Date();
     const dv = parseDataFlexSafe(vencimento);
-    return dv ? Math.floor((dv - hoje) / (1000 * 60 * 60 * 24)) : null;
+    if (!dv) return null;
+    hoje.setHours(0, 0, 0, 0);
+    dv.setHours(0, 0, 0, 0);
+    return Math.ceil((dv - hoje) / (1000 * 60 * 60 * 24));
 }
 function corAlerta(dias) {
     if (dias <= 0) return "urgente";
     if (dias <= 3) return "aviso";
-    if (dias <= 5) return "atencao";
     return "normal";
 }
 function classeTextoAlerta(dias) {
-    if (dias <= 0) return "texto-vencido";
+    if (dias < 0) return "texto-vencido";
     if (dias <= 3) return "texto-vence-breve";
-    if (dias <= 5) return "texto-vence-hoje";
     return "texto-normal";
 }
 function mensagemAlerta(dias) {
@@ -90,8 +94,12 @@ function atualizarCalendarioSemana() {
     if (!calendarioSemana) return;
     const contas = obterContas();
     const semanas = 5;
-    const valorPorSemana = Array.from({ length: semanas }, () => 0);
-    const pagamentosPorSemana = Array.from({ length: semanas }, () => []);
+    const valorPorSemana = Array.from({
+        length: semanas
+    }, () => 0);
+    const pagamentosPorSemana = Array.from({
+        length: semanas
+    }, () => []);
 
     contas.forEach(c => {
         (c.pagamentos || []).forEach(p => {
@@ -100,7 +108,9 @@ function atualizarCalendarioSemana() {
             const sem = semanaDoMes(pd);
             if (sem >= 1 && sem <= semanas) {
                 valorPorSemana[sem - 1] += toNumber(p.valor);
-                pagamentosPorSemana[sem - 1].push({ ...p, conta: c });
+                pagamentosPorSemana[sem - 1].push({ ...p,
+                    conta: c
+                });
             }
         });
     });
@@ -115,7 +125,9 @@ function atualizarCalendarioSemana() {
         div.className = "semana-card";
         div.setAttribute("data-semana", i + 1);
         div.innerHTML = `Semana ${i + 1}<br/>${formatBRL(valorPorSemana[i])}`;
-        div.style.backgroundColor = valorPorSemana[i] > 0 ? `rgba(220,53,69,${0.3 + valorPorSemana[i]/maxValor*0.7})` : "#e9ecef";
+        const corBaseRoxa = [108, 92, 231];
+        const intensidade = valorPorSemana[i] > 0 ? (0.3 + (valorPorSemana[i] / maxValor) * 0.7) : 0;
+        div.style.backgroundColor = `rgba(${corBaseRoxa.join(',')}, ${intensidade})`;
         div.style.color = valorPorSemana[i] > 0 ? "#fff" : "#000";
 
         div.addEventListener("click", () => {
@@ -136,11 +148,64 @@ function atualizarCalendarioSemana() {
     }
 }
 
+function criarElementoGasto(gasto, isAlerta = false) {
+    const li = document.createElement("li");
+    const conta = gasto.conta;
+    
+    // Verificação de segurança para a data
+    const dataObj = parseDataFlexSafe(gasto.data);
+    const dataFormat = dataObj ? dataObj.toLocaleDateString('pt-BR') : 'Data não disponível';
+
+    let innerHTML = '';
+    if (isAlerta) {
+        const dias = diasParaVencimento(conta.vencimento);
+        const cor = corAlerta(dias);
+        const classeTexto = classeTextoAlerta(dias);
+        const mensagem = mensagemAlerta(dias);
+        
+        const vencimentoObj = parseDataFlexSafe(conta.vencimento);
+        const vencimentoFormatado = vencimentoObj ? vencimentoObj.toLocaleDateString('pt-BR') : 'Data não disponível';
+
+        innerHTML = `
+            <div class="alerta-item alerta-${cor}">
+                <div class="alerta-header">
+                    <div class="alerta-title-group">
+                        <span class="alerta-categoria-tag tag-${conta.categoria || 'outros'}">${(conta.categoria || 'Outros').charAt(0).toUpperCase() + (conta.categoria || 'Outros').slice(1)}</span>
+                        <span class="alerta-title">${conta.nome}</span>
+                    </div>
+                    <span class="alerta-valor">${formatBRL(conta.valor)}</span>
+                </div>
+                <div class="alerta-body">
+                    <span class="alerta-message ${classeTexto}">${mensagem}</span>
+                    <div class="alerta-right-group">
+                        <span class="alerta-data ${classeTexto}">Vencimento: ${vencimentoFormatado}</span>
+                        <span class="alerta-info">Parcela ${conta.parcelaAtual || 1} de ${conta.parcelas || 1}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        innerHTML = `
+            <div class="gasto-detalhe-card cat-${conta.categoria || "outros"}">
+                <div class="gasto-detalhe-header">
+                    <span class="gasto-detalhe-title">${conta.nome}</span>
+                    <span class="gasto-detalhe-valor">${formatBRL(gasto.valor)}</span>
+                </div>
+                <div class="gasto-detalhe-body">
+                    <span class="gasto-detalhe-data">Pago em: ${dataFormat}</span>
+                    <small class="text-muted">Parcela ${conta.parcelaAtual || 1} de ${conta.parcelas || 1}</small>
+                </div>
+            </div>
+        `;
+    }
+    li.innerHTML = innerHTML;
+    return li;
+}
+
 function renderizarDetalheGastos(semana, pagamentos) {
     if (!detalheGastos) return;
     detalheGastos.innerHTML = `<h4>Gastos da Semana ${semana}</h4>`;
     const ul = document.createElement("ul");
-
     if (!pagamentos || pagamentos.length === 0) {
         const li = document.createElement("li");
         li.className = "text-muted text-center py-3";
@@ -148,20 +213,7 @@ function renderizarDetalheGastos(semana, pagamentos) {
         ul.appendChild(li);
     } else {
         pagamentos.forEach(p => {
-            const li = document.createElement("li");
-            const dataFormat = parseDataFlexSafe(p.data).toLocaleDateString('pt-BR');
-            li.innerHTML = `
-                <div class="gasto-detalhe-card cat-${p.conta.categoria || "outros"}">
-                    <div class="gasto-detalhe-header">
-                        <span class="gasto-detalhe-title">${p.conta.nome}</span>
-                        <span class="gasto-detalhe-valor">${formatBRL(p.valor)}</span>
-                    </div>
-                    <div class="gasto-detalhe-body">
-                        <span class="gasto-detalhe-data">Pago em: ${dataFormat}</span>
-                        <small class="text-muted">Parcela ${p.conta.parcelaAtual || 1} de ${p.conta.parcelas || 1}</small>
-                    </div>
-                </div>
-            `;
+            const li = criarElementoGasto(p);
             ul.appendChild(li);
         });
     }
@@ -171,48 +223,64 @@ function renderizarDetalheGastos(semana, pagamentos) {
 // --- Alertas ---
 function atualizarAlertas() {
     if (!alertasContainer) return;
+
+    const alertaMesConcluidoContainer = document.getElementById("alerta-mes-concluido");
+    if (alertaMesConcluidoContainer) {
+        alertaMesConcluidoContainer.innerHTML = "";
+    }
+    
     alertasContainer.innerHTML = "";
 
+    const hoje = new Date();
+    const anoAtual = hoje.getFullYear();
+    const mesAtual = hoje.getMonth();
     const contas = obterContas();
-    let contasPendentes = contas.filter(c => (c.parcelaAtual || 0) < (c.parcelas || 1));
 
-    if (contasPendentes.length === 0) {
-        alertasContainer.innerHTML = "<p class='text-success text-center'>Todas as contas do mês quitadas! Aqui estão as contas do próximo mês:</p>";
-        contasPendentes = contas;
+    const contasPendentes = contas.filter(c => (c.parcelaAtual || 0) < (c.parcelas || 1));
+
+    let contasParaExibir = contasPendentes.filter(c => {
+        const venc = parseDataFlexSafe(c.vencimento);
+        return venc && venc.getFullYear() === anoAtual && venc.getMonth() === mesAtual;
+    });
+
+    if (contasParaExibir.length === 0) {
+        const proximoMes = new Date(anoAtual, mesAtual + 1, 1);
+        const nomeProximoMes = proximoMes.toLocaleDateString('pt-BR', {
+            month: 'long',
+            year: 'numeric'
+        });
+
+        contasParaExibir = contasPendentes.filter(c => {
+            const venc = parseDataFlexSafe(c.vencimento);
+            return venc && venc.getFullYear() === proximoMes.getFullYear() && venc.getMonth() === proximoMes.getMonth();
+        });
+
+        if (contasParaExibir.length > 0) {
+            if (alertaMesConcluidoContainer) {
+                alertaMesConcluidoContainer.innerHTML = `
+                    <div class="alerta-mes-concluido">
+                        <span class="alerta-icone">✅</span>
+                        <span class="alerta-texto">Todas as contas do mês quitadas! Aqui estão as contas de ${nomeProximoMes}:</span>
+                    </div>
+                `;
+            }
+        }
     }
 
-    contasPendentes.forEach(c => {
-        const venc = parseDataFlexSafe(c.vencimento);
-        if (!venc) return;
-        const proximaParcela = new Date(venc);
-        proximaParcela.setMonth(venc.getMonth() + (c.parcelaAtual || 0));
-        const dias = diasParaVencimento(proximaParcela);
-        const cor = corAlerta(dias);
-        const classeTexto = classeTextoAlerta(dias);
-        const mensagem = mensagemAlerta(dias);
+    contasParaExibir.sort((a, b) => diasParaVencimento(a.vencimento) - diasParaVencimento(b.vencimento));
 
-        const li = document.createElement("li");
-        li.innerHTML = `
-            <div class="alerta-item alerta-${cor}">
-                <div class="alerta-header">
-                    <div class="alerta-title-group">
-                        <span class="alerta-categoria-tag tag-${c.categoria || 'outros'}">${(c.categoria || 'Outros').charAt(0).toUpperCase() + (c.categoria || 'Outros').slice(1)}</span>
-                        <span class="alerta-title">${c.nome}</span>
-                    </div>
-                    <span class="alerta-valor">${formatBRL(c.valor)}</span>
-                </div>
-                <div class="alerta-body">
-                    <span class="alerta-message ${classeTexto}">${mensagem}</span>
-                    <div class="alerta-right-group">
-                        <span class="alerta-data ${classeTexto}">Vencimento: ${proximaParcela.toLocaleDateString('pt-BR')}</span>
-                        <span class="alerta-info">Parcela ${c.parcelaAtual + 1} de ${c.parcelas}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-        alertasContainer.appendChild(li);
-    });
+    if (contasParaExibir.length > 0) {
+        contasParaExibir.forEach(c => {
+            const li = criarElementoGasto({ conta: c }, true);
+            alertasContainer.appendChild(li);
+        });
+    } else if (contasPendentes.length > 0 && contasParaExibir.length === 0) {
+        alertasContainer.innerHTML = "<p class='text-muted text-center'>Nenhuma conta para o próximo mês.</p>";
+    } else {
+        alertasContainer.innerHTML = "<p class='text-muted text-center'>Nenhuma conta pendente para os próximos meses.</p>";
+    }
 }
+
 
 // --- Gráfico de Pizza Interativo ---
 function atualizarGraficoGastos() {
@@ -220,7 +288,9 @@ function atualizarGraficoGastos() {
 
     const contas = obterContas();
     const hoje = new Date();
-    const pagamentos = contas.flatMap(c => (c.pagamentos || []).map(p => ({ ...p, conta: c })))
+    const pagamentos = contas.flatMap(c => (c.pagamentos || []).map(p => ({ ...p,
+        conta: c
+    })))
         .filter(p => {
             const pd = parseDataFlexSafe(p.data);
             return pd && pd.getMonth() === hoje.getMonth() && pd.getFullYear() === hoje.getFullYear();
@@ -239,18 +309,28 @@ function atualizarGraficoGastos() {
     if (graficoPizza) graficoPizza.destroy();
 
     graficoPizza = new Chart(graficoCtxEl, {
-        type: "pie", // <-- gráfico cheio, sem buraco
-        data: { labels, datasets: [{ data, backgroundColor: colors, borderColor:"#fff", borderWidth:2 }] },
+        type: "pie",
+        data: {
+            labels,
+            datasets: [{
+                data,
+                backgroundColor: colors,
+                borderColor: "#fff",
+                borderWidth: 2
+            }]
+        },
         options: {
-            responsive:true,
-            plugins:{
-                legend:{ display:false },
-                tooltip:{
-                    callbacks:{
-                        label:function(context){
-                            const total = context.dataset.data.reduce((a,b)=>a+b,0);
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const val = context.parsed;
-                            const perc = ((val/total)*100).toFixed(1) + "%";
+                            const perc = ((val / total) * 100).toFixed(1) + "%";
                             return `${context.label}: ${formatBRL(val)} (${perc})`;
                         }
                     }
@@ -262,7 +342,7 @@ function atualizarGraficoGastos() {
     // Legenda customizada interativa
     if (legendaContainer) {
         legendaContainer.innerHTML = "";
-        labels.forEach((label,i)=>{
+        labels.forEach((label, i) => {
             const div = document.createElement("div");
             div.className = "legenda-item";
             div.innerHTML = `
@@ -270,7 +350,7 @@ function atualizarGraficoGastos() {
                 <span class="legenda-nome">${label}</span>
                 <span class="legenda-valor">${formatBRL(data[i])}</span>
             `;
-            div.addEventListener("click", ()=>{
+            div.addEventListener("click", () => {
                 const meta = graficoPizza.getDatasetMeta(0);
                 meta.data[i].hidden = !meta.data[i].hidden;
                 graficoPizza.update();
