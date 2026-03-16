@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Objetivos & Investimentos - Finance Track</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css?v=115">
+</head>
+<body class="bg-light">
+
+<header class="new-header">
+    <div class="container d-flex flex-wrap align-items-center justify-content-between py-2">
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-menu d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+                <i class="bi bi-list"></i>
+            </button>
+            <a href="index.html" class="d-flex align-items-center logo-brand"><i class="bi bi-wallet2"></i><span>Finance Track</span></a>
+        </div>
+        
+        <ul class="nav new-nav-links d-none d-md-flex align-items-center">
+            <li><a href="index.html" class="nav-link"><i class="bi bi-house-door-fill"></i> Home</a></li>
+            <li><a href="movimentacoes.html" class="nav-link"><i class="bi bi-currency-dollar"></i> Movimentações</a></li>
+            <li><a href="objetivos.html" class="nav-link active-link"><i class="bi bi-flag-fill"></i> Objetivos</a></li>
+            <li><a href="relatorios.html" class="nav-link"><i class="bi bi-bar-chart-fill"></i> Relatórios</a></li>
+            <li><a href="configuracoes.html" class="nav-link"><i class="bi bi-gear-fill"></i> Configurações</a></li>
+            <li class="ms-2">
+                <button class="btn btn-light rounded-circle shadow-sm btn-toggle-tema p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="bi bi-moon-stars-fill text-dark"></i>
+                </button>
+            </li>
+        </ul>
+
+        <div class="d-md-none d-flex align-items-center">
+            <button class="btn btn-light border btn-toggle-tema px-3 py-1 rounded-3">
+                <i class="bi bi-moon-stars-fill text-dark"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<main class="container my-4">
+    <div id="resumoObjetivos" class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card text-center shadow-sm h-100" style="border-left: 5px solid var(--purple-dark); border-radius: 12px;">
+                <div class="card-body">
+                    <h5 class="card-title text-muted fw-bold">Patrimônio Acumulado</h5>
+                    <p id="totalGuardado" class="fs-3 fw-bold text-primary-purple mb-0">R$ 0,00</p>
+                    <small class="text-muted">Soma de Objetivos + Investimentos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card text-center shadow-sm h-100" style="border-left: 5px solid var(--green-success); border-radius: 12px;">
+                <div class="card-body">
+                    <h5 class="card-title text-muted fw-bold">Saldo Livre (Home)</h5>
+                    <p id="saldoLivre" class="fs-3 fw-bold text-success mb-0">R$ 0,00</p>
+                    <small class="text-muted">Disponível para aportar</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4 shadow-sm" style="border-radius: 12px; border: 1px solid rgba(0,0,0,0.05);">
+        <div class="card-body d-flex justify-content-between align-items-center border-bottom pb-3">
+            <h2 class="card-title mb-0 fs-4 text-dark fw-bold"><i class="bi bi-graph-up-arrow text-primary-purple me-2"></i>Carteira & Objetivos</h2>
+            <button class="btn btn-purple-add px-4" data-bs-toggle="modal" data-bs-target="#modalObjetivo">
+                <i class="bi bi-plus-circle"></i> Criar
+            </button>
+        </div>
+        <div class="p-3 bg-light">
+            <div class="row" id="listaObjetivos"></div>
+        </div>
+    </div>
+</main>
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+  <div class="offcanvas-header border-bottom">
+    <h5 class="offcanvas-title logo-brand" id="mobileMenuLabel"><i class="bi bi-wallet2"></i> Finance Track</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="nav flex-column">
+        <li class="nav-item"><a href="index.html" class="nav-link"><i class="bi bi-house-door-fill"></i> Home</a></li>
+        <li class="nav-item"><a href="movimentacoes.html" class="nav-link"><i class="bi bi-currency-dollar"></i> Movimentações</a></li>
+        <li class="nav-item"><a href="objetivos.html" class="nav-link active-link"><i class="bi bi-flag-fill"></i> Objetivos</a></li>
+        <li class="nav-item"><a href="relatorios.html" class="nav-link"><i class="bi bi-bar-chart-fill"></i> Relatórios</a></li>
+        <li class="nav-item"><a href="configuracoes.html" class="nav-link"><i class="bi bi-gear-fill"></i> Configurações</a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="modal fade" id="modalObjetivo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius: 12px;">
+            <form id="formNovoObjetivo">
+                <div class="modal-header bg-light border-bottom-0">
+                    <h5 class="modal-title fw-bold text-dark"><i class="bi bi-flag-fill me-2 text-primary-purple"></i>Novo Registro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold text-uppercase">O que você quer criar?</label>
+                        <select id="tipoRegistro" class="form-select form-select-lg fw-bold text-primary-purple border-primary shadow-sm mb-3">
+                            <option value="objetivo">🎯 Objetivo (Ex: Viagem, Carro, Fundo)</option>
+                            <option value="investimento">📈 Investimento (Ex: FIIs, Ações, Tesouro)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="boxTicker" style="display: none;">
+                        <label class="form-label text-muted small fw-bold text-uppercase">Código do Ativo (Ticker)</label>
+                        <div class="input-group">
+                            <input type="text" id="tickerAtivo" class="form-control" placeholder="Ex: MXRF11 ou PETR4" list="listaTickers">
+                            <button class="btn btn-outline-primary" type="button" id="btnExplorarMercado" title="Explorar todos os ativos">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                        <datalist id="listaTickers"></datalist>
+                        <small class="text-primary fw-bold" style="font-size: 0.7rem;"><i class="bi bi-info-circle"></i> Comece a digitar ou use a lupa para buscar.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label id="labelNome" for="nomeObjetivo" class="form-label text-muted small fw-bold text-uppercase">Nome do Objetivo</label>
+                        <input type="text" id="nomeObjetivo" class="form-control form-control-lg" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label id="labelValorAlvo" for="valorAlvo" class="form-label text-muted small fw-bold text-uppercase">Valor Alvo (Meta)</label>
+                            <input type="number" id="valorAlvo" class="form-control form-control-lg text-primary-purple fw-bold" placeholder="R$ 0,00" min="1" step="0.01" required>
+                        </div>
+                        <div class="col-md-6" id="boxDataAlvo"> <label for="dataAlvoObjetivo" class="form-label text-muted small fw-bold text-uppercase">Para quando?</label>
+                            <input type="date" id="dataAlvoObjetivo" class="form-control form-control-lg border-primary">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-purple-add px-4">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalManipularObjetivo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow" style="border-radius: 12px;">
+            <div class="modal-header bg-light border-bottom-0">
+                <h5 class="modal-title fw-bold text-dark" id="tituloManipular">Ação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <p class="text-muted mb-4" id="descManipular">Valor?</p>
+                <input type="hidden" id="indexObjetivoAtivo">
+                <input type="hidden" id="tipoAcaoModal">
+                <div class="input-group input-group-lg mb-3">
+                    <span class="input-group-text bg-white border-end-0">R$</span>
+                    <input type="number" id="valorManipular" class="form-control border-start-0 ps-0 fw-bold" placeholder="0,00" min="0.01" step="0.01" required>
+                </div>
+                <small id="avisoSaldo" class="text-danger fw-bold" style="display: none;"><i class="bi bi-exclamation-triangle"></i> Saldo insuficiente!</small>
+            </div>
+            <div class="modal-footer border-top-0 pt-0 pb-4 px-4 d-flex justify-content-center">
+                <button id="btnConfirmarAcao" class="btn btn-purple-add w-100 py-2 fs-5">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalExplorar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 12px; height: 80vh;">
+            <div class="modal-header border-0 bg-light">
+                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>Explorador de Ativos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0 d-flex flex-column">
+                <div class="p-3 bg-white border-bottom">
+                    <input type="text" id="buscaExplorar" class="form-control form-control-lg" placeholder="Digite para pesquisar (Ex: VALE, PETR, MXRF)...">
+                </div>
+                <div id="containerResultados" class="flex-grow-1 overflow-auto p-3 d-flex flex-wrap gap-2 align-content-start">
+                    <div class="text-center w-100 py-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted">Carregando ativos...</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="new-footer text-white text-center py-3 mt-4">
+    <p>Desenvolvido por Luis Charles</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="main.js"></script>
+<script src="objetivos.js"></script>
+</body>
+</html>

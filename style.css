@@ -49,14 +49,23 @@ body {
 .offcanvas .nav-link.active-link { background-color: var(--purple-dark); color: #fff; box-shadow: 0 2px 5px rgba(108, 92, 231, 0.3); }
 
 /* =========================
-   CARDS DE RESUMO
+   CARDS DE RESUMO E ANIMAÇÕES
    ========================= */
-#resumo .card, #resumoContas .card, #resumoGanhos .card {
+#resumo .card, 
+#resumoContas .card, 
+#resumoGanhos .card, 
+#resumoObjetivos .card, 
+#resumoRelatorios .card {
     border-left: 5px solid transparent;
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     border-radius: 8px;
 }
-#resumo .card:hover, #resumoContas .card:hover, #resumoGanhos .card:hover {
+
+#resumo .card:hover, 
+#resumoContas .card:hover, 
+#resumoGanhos .card:hover, 
+#resumoObjetivos .card:hover, 
+#resumoRelatorios .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12) !important;
 }
@@ -73,7 +82,7 @@ body {
 .text-success-green { color: var(--green-success) !important; }
 
 /* =========================
-   CALENDÁRIO SEMANAL (Home)
+   CALENDÁRIO SEMANAL E DETALHES DA HOME
    ========================= */
 .calendario-wrapper { overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
 .calendario-wrapper::-webkit-scrollbar { display: none; }
@@ -81,26 +90,66 @@ body {
 #calendarioSemana { display: flex; flex-wrap: nowrap; min-width: 600px; justify-content: space-between; }
 #calendarioSemana div { flex: 1; padding: 10px; margin: 2px; border-radius: 5px; background-color: #e9ecef; text-align: center; transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; cursor: pointer; }
 #calendarioSemana div:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
-#calendarioSemana div.semana-ativa { border: 2px solid var(--purple-dark); background-color: var(--purple-dark) !important; color: white !important; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3); }
+
+/* --- AQUI ESTÁ A PRIMEIRA MUDANÇA: Semana Ativa no MODO CLARO --- */
+#calendarioSemana div.semana-ativa { 
+    border: 2px solid var(--purple-dark) !important; 
+    background-color: transparent !important; 
+    color: var(--purple-dark) !important; 
+    box-shadow: none; 
+}
 
 #detalheGastos { transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1); max-height: 0; opacity: 0; margin-top: 1rem; padding: 0 1rem; overflow: hidden; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
 #detalheGastos.mostrar { max-height: 500px; opacity: 1; padding: 1rem; overflow-y: auto; }
-.gasto-detalhe-card { padding: 1rem; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); border-left: 5px solid transparent; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
-.gasto-detalhe-card:hover { transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+
+/* Classes que vão englobar todos os "pulos" nos itens listados */
+.gasto-detalhe-card, 
+.list-group-item, 
+.alerta-item,
+.conta-item,
+.mov-item {
+    padding: 1rem;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-left: 5px solid transparent; 
+    border-top: 1px solid var(--border-light);
+    border-right: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 0.8rem;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
+}
+
+.gasto-detalhe-card:hover, 
+.list-group-item:hover, 
+.alerta-item:hover,
+.conta-item:hover,
+.mov-item:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08) !important;
+    z-index: 1;
+}
+
 #detalheGastos h4 { border-bottom: 2px solid #ddd; padding-bottom: 5px; margin-bottom: 10px; }
 #detalheGastos ul { list-style: none; padding: 0; margin: 0; }
-#detalheGastos li { padding: 0.5rem 0; }
+#detalheGastos li { padding: 0; }
+
 .gasto-detalhe-header { display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; }
 .gasto-detalhe-title { font-weight: 600; color: #343a40; }
 .gasto-detalhe-data { font-size: 0.9rem; color: #6c757d; }
 .gasto-detalhe-body { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 0.5rem; border-top: 1px dashed #eee; padding-top: 0.5rem; }
 .gasto-detalhe-valor { font-size: 1rem; font-weight: 700; margin: 0; }
 
-.cat-alimentacao { border-left-color: #28a745; }
-.cat-transporte { border-left-color: #0d6efd; }
-.cat-lazer { border-left-color: #fd7e14; }
-.cat-divida { border-left-color: #dc3545; }
-.cat-outros { border-left-color: #6c757d; }
+/* === BORDAS DAS CATEGORIAS (CLARO E GERAL) === */
+.cat-alimentacao { border-left-color: #28a745 !important; }
+.cat-mercado { border-left-color: #20c997 !important; }
+.cat-aluguel { border-left-color: #6f42c1 !important; }
+.cat-financiamento { border-left-color: #17a2b8 !important; }
+.cat-emprestimo { border-left-color: #e83e8c !important; }
+.cat-transporte { border-left-color: #0d6efd !important; }
+.cat-lazer { border-left-color: #fd7e14 !important; }
+.cat-divida { border-left-color: #dc3545 !important; }
+.cat-outros { border-left-color: #6c757d !important; }
 
 /* =========================
    ESTILOS GERAIS DE ALERTA (Tela Home)
@@ -112,8 +161,6 @@ body {
 
 #alertas { list-style: none; padding-left: 0; margin: 0; }
 #alertas li { padding: 0.5rem 0; }
-.alerta-item { display: flex; flex-direction: column; padding: 1rem; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); border-left: 5px solid transparent; transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-left-color 0.3s ease; }
-.alerta-item:hover { transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
 .alerta-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
 .alerta-title-group { display: flex; align-items: center; flex-grow: 1; }
 .alerta-categoria-tag { font-size: 0.7em; padding: 3px 8px; border-radius: 50px; color: #fff; font-weight: bold; text-transform: uppercase; white-space: nowrap; margin-right: 10px; }
@@ -125,48 +172,35 @@ body {
 .alerta-info { font-size: 0.8rem; color: #888; }
 .alerta-message { font-weight: 600; }
 
-.alerta-normal.alerta-item { border-left-color: #28a745; }
-.alerta-atencao.alerta-item { border-left-color: #ffc107; }
-.alerta-urgente.alerta-item { border-left-color: #dc3545; }
-.alerta-aviso.alerta-item { border-left-color: #fd7e14; }
+.alerta-normal { border-left-color: #28a745 !important; }
+.alerta-atencao { border-left-color: #ffc107 !important; }
+.alerta-urgente { border-left-color: #dc3545 !important; }
+.alerta-aviso { border-left-color: #fd7e14 !important; }
 
 .texto-vencido { color: #dc3545; font-weight: bold; }
 .texto-vence-hoje { color: #ffc107; font-weight: bold; }
 .texto-vence-breve { color: #fd7e14; font-weight: bold; }
 .texto-normal { color: #28a745; }
 
+/* === AS CORES DAS TAGS DA HOME ESTÃO DE VOLTA AQUI === */
+.tag-alimentacao { background-color: #28a745; }
+.tag-mercado { background-color: #20c997; }
+.tag-aluguel { background-color: #6f42c1; }
+.tag-financiamento { background-color: #17a2b8; }
+.tag-emprestimo { background-color: #e83e8c; }
+.tag-transporte { background-color: #0d6efd; }
+.tag-lazer { background-color: #fd7e14; }
+.tag-divida { background-color: #dc3545; }
+.tag-outros { background-color: #6c757d; }
+/* ======================================================= */
+
 /* ==========================================================
    ESTRUTURA DAS CONTAS (PROFISSIONAL E LIMPO)
 ========================================================== */
-.conta-item {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-light);
-    border-radius: 8px !important;
-    margin-bottom: 0.8rem;
-    overflow: hidden; 
-    transition: all 0.3s ease;
-    padding: 0 !important; 
-}
-.conta-item:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-
 /* MOBILE (Por Padrão): Botões embaixo do conteúdo, como num rodapé */
-.main-row { 
-    display: flex; 
-    flex-direction: column; 
-    width: 100%; 
-}
-.list-item-content { 
-    padding: 1.2rem 1.5rem; 
-    cursor: pointer; 
-    background-color: transparent; 
-}
-.list-item-actions { 
-    display: flex; 
-    flex-direction: row; 
-    justify-content: flex-end; /* Botões vão para a direita */
-    gap: 0.8rem; /* Espaço entre as bolinhas */
-    padding: 0 1.5rem 1.2rem 1.5rem; /* Margem inferior para afastar do card */
-}
+.main-row { display: flex; flex-direction: column; width: 100%; }
+.list-item-content { padding: 1.2rem 1.5rem; cursor: pointer; background-color: transparent; }
+.list-item-actions { display: flex; flex-direction: row; justify-content: flex-end; gap: 0.8rem; padding: 0 1.5rem 1.2rem 1.5rem; }
 
 /* BOTÕES NO CELULAR (Redondos com Sombra) */
 .btn-action { 
@@ -313,8 +347,7 @@ body {
 .progress-bar { background-image: none !important; border-radius: 4px; transition: width 0.8s ease, background-color 0.8s ease; }
 badge { color: #fff; font-size: 0.75rem; text-transform: capitalize; padding: 0.35em 0.65em; border-radius: 4px;}
 
-#listaGanhos .list-group-item { background-color: #ffffff; color: var(--text-dark); border: 1px solid var(--border-light); display: flex !important; flex-direction: row !important; justify-content: space-between; align-items: center; padding: 1rem 1.5rem !important; border-radius: 8px !important; margin-bottom: 0.8rem; transition: all 0.3s ease; }
-#listaGanhos .list-group-item:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+#listaGanhos .list-group-item { background-color: #ffffff; color: var(--text-dark); display: flex !important; flex-direction: row !important; justify-content: space-between; align-items: center; }
 
 #listaGanhos .btn-remover-ganho { background-color: var(--red-danger); color: #fff; border: none; font-size: 0.85rem; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 6px; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 #listaGanhos .btn-remover-ganho:hover { background-color: #c82333; transform: translateY(-2px); }
@@ -346,7 +379,7 @@ badge { color: #fff; font-size: 0.75rem; text-transform: capitalize; padding: 0.
 .animacao-desfazer { animation: pulse-yellow 0.6s ease-out; }
 
 /* ==========================================================
-   ALINHAMENTO DOS INPUTS NOS MODAIS (O SEU FIX AQUI!)
+   ALINHAMENTO DOS INPUTS NOS MODAIS
 ========================================================== */
 #modalConta .row .form-label, 
 #modalGanho .row .form-label {
@@ -364,4 +397,247 @@ badge { color: #fff; font-size: 0.75rem; text-transform: capitalize; padding: 0.
     .new-header .btn-menu { display: block !important; }
     .offcanvas-body .nav-link.active-link { color: var(--purple-dark); background-color: transparent; }
     .offcanvas-body .nav-link.active-link::before { content: "•"; color: var(--purple-dark); font-size: 2rem; line-height: 1rem; margin-right: 0.5rem; }
+}
+
+/* =========================================
+   DARK MODE (TEMA ESCURO) BLINDADO E DEFINITIVO
+   ========================================= */
+[data-theme="dark"] {
+    --bg-light: #121212;
+    --card-bg: #1e1e1e;
+    --border-light: #333333;
+    --light-grey: #2b2b2b;
+    --text-dark: #f8f9fa; /* Força a variável global a ficar clara */
+}
+
+/* Fundo da página e cor do texto principal */
+[data-theme="dark"] body { 
+    background-color: var(--bg-light) !important; 
+    color: var(--text-dark) !important; 
+}
+
+/* Navbar (Links do Menu) */
+[data-theme="dark"] .new-nav-links .nav-link { color: #e0e0e0 !important; }
+[data-theme="dark"] .new-nav-links .nav-link:hover { color: #ffffff !important; background-color: rgba(255,255,255,0.05) !important; }
+[data-theme="dark"] .new-nav-links .nav-link.active-link { color: #ffffff !important; background-color: var(--purple-dark) !important; }
+
+/* Cards, Modais, Menus Laterais, Contas e Histórico */
+[data-theme="dark"] .card, 
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .offcanvas,
+[data-theme="dark"] .historico-card { 
+    background-color: var(--card-bg) !important; 
+    border-color: var(--border-light) !important; 
+}
+
+/* Correção ABSOLUTA para LISTAS, ITENS DE GANHO e FUNDOS BRANCOS ESCONDIDOS */
+[data-theme="dark"] #listaGanhos .list-group-item,
+[data-theme="dark"] .list-group-item,
+[data-theme="dark"] .ganho-item,
+[data-theme="dark"] .mov-item,
+[data-theme="dark"] .detalhe-gastos,
+[data-theme="dark"] #listaGanhos div,
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .historico-timeline,
+[data-theme="dark"] .conta-item,
+[data-theme="dark"] .gasto-detalhe-card,
+[data-theme="dark"] .alerta-item { 
+    background-color: var(--card-bg) !important; 
+    color: #ffffff !important;
+    border-color: var(--border-light) !important;
+}
+
+/* Sombras no Hover Escuro */
+[data-theme="dark"] .gasto-detalhe-card:hover, 
+[data-theme="dark"] .list-group-item:hover, 
+[data-theme="dark"] .alerta-item:hover,
+[data-theme="dark"] .conta-item:hover,
+[data-theme="dark"] .mov-item:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* --- ADICIONADO: Detalhamento de Contas (Aquele fundo branco horroroso) --- */
+[data-theme="dark"] .detalhes-conta { 
+    background-color: #1a1a1a !important; 
+    border-top: 1px solid #333 !important;
+}
+
+/* Blindagem contra a classe bg-white do Bootstrap dentro dos detalhes */
+[data-theme="dark"] .detalhes-conta .bg-white,
+[data-theme="dark"] .detalhes-conta .border.rounded-3,
+[data-theme="dark"] .detalhes-conta .p-4.bg-white.border {
+    background-color: #252525 !important;
+    border-color: #444 !important;
+    color: #ffffff !important;
+}
+/* -------------------------------------------------------------------------- */
+
+/* Textos Escuros que precisam ficar Brancos */
+[data-theme="dark"] .text-dark { color: #ffffff !important; }
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, 
+[data-theme="dark"] h4, [data-theme="dark"] h5, [data-theme="dark"] h6,
+[data-theme="dark"] .card-title, [data-theme="dark"] .offcanvas-title,
+[data-theme="dark"] .historico-header, [data-theme="dark"] .timeline-title { 
+    color: #ffffff !important; 
+}
+
+/* Textos Secundários / Legendas (Ajustado para melhor leitura das datas) */
+[data-theme="dark"] .text-muted, 
+[data-theme="dark"] small, 
+[data-theme="dark"] .small,
+[data-theme="dark"] .opacity-75,
+[data-theme="dark"] .gasto-detalhe-body small,
+[data-theme="dark"] .timeline-date { 
+    color: #ced4da !important; 
+    opacity: 1 !important;
+}
+
+/* Correção de Valores e Textos Pretos nas Listas e Home */
+[data-theme="dark"] .gasto-detalhe-valor, 
+[data-theme="dark"] .alerta-valor, 
+[data-theme="dark"] .legenda-valor,
+[data-theme="dark"] .gasto-detalhe-title, 
+[data-theme="dark"] .alerta-title { 
+    color: #ffffff !important; 
+}
+
+/* --- AQUI ESTÁ A SEGUNDA MUDANÇA: Semana Ativa no MODO ESCURO --- */
+[data-theme="dark"] .semana-card { 
+    color: #ffffff !important; 
+    border-color: #444 !important; 
+    background-color: #252525 !important;
+}
+[data-theme="dark"] #calendarioSemana div { background-color: #252525 !important; }
+
+[data-theme="dark"] #calendarioSemana div.semana-ativa { 
+    border-color: var(--purple-light) !important; 
+    color: var(--purple-light) !important; 
+}
+
+/* Correção do fundo branco na lista de gastos do calendário (Detalhes) */
+[data-theme="dark"] .detalhe-gastos { 
+    background-color: var(--card-bg) !important; 
+    border-color: var(--border-light) !important; 
+}
+
+/* Caixas de Texto (Inputs e Selects) */
+[data-theme="dark"] .form-control, 
+[data-theme="dark"] .form-select, 
+[data-theme="dark"] .input-group-text { 
+    background-color: #2b2b2b !important; 
+    border-color: #444 !important; 
+    color: #ffffff !important; 
+}
+[data-theme="dark"] .form-control::placeholder { color: #888 !important; }
+
+/* Botões Claros */
+[data-theme="dark"] .btn-light { 
+    background-color: #333 !important; 
+    color: #fff !important; 
+    border-color: #444 !important; 
+}
+[data-theme="dark"] .btn-light i { color: #fff !important; }
+
+/* Fundos Auxiliares (como o bg-light) */
+[data-theme="dark"] .bg-white { background-color: var(--card-bg) !important; }
+[data-theme="dark"] .bg-light { background-color: var(--light-grey) !important; }
+
+/* Bordas em geral */
+[data-theme="dark"] .border, [data-theme="dark"] .border-top, [data-theme="dark"] .border-bottom, 
+[data-theme="dark"] .border-end, [data-theme="dark"] .border-start { 
+    border-color: var(--border-light) !important; 
+}
+
+/* Header e Listas de Extrato */
+[data-theme="dark"] .new-header { background-color: var(--card-bg) !important; border-bottom: 1px solid var(--border-light) !important; }
+
+/* Gráficos (Mantém as cores originais, apenas suaviza o brilho para não ofuscar) */
+[data-theme="dark"] canvas { filter: brightness(0.85); }
+
+/* Barra de rolagem (Scrollbar) escura elegante */
+[data-theme="dark"] ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: var(--bg-light);
+    border-radius: 4px;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 4px;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--purple-dark); 
+}
+
+/* ==========================================================
+   FORÇAR CORES DAS BORDAS NO MODO ESCURO (SOBREPÕE O CINZA)
+========================================================== */
+[data-theme="dark"] .cat-alimentacao { border-left-color: #28a745 !important; }
+[data-theme="dark"] .cat-mercado { border-left-color: #20c997 !important; }
+[data-theme="dark"] .cat-aluguel { border-left-color: #6f42c1 !important; }
+[data-theme="dark"] .cat-financiamento { border-left-color: #17a2b8 !important; }
+[data-theme="dark"] .cat-emprestimo { border-left-color: #e83e8c !important; }
+[data-theme="dark"] .cat-transporte { border-left-color: #0d6efd !important; }
+[data-theme="dark"] .cat-lazer { border-left-color: #fd7e14 !important; }
+[data-theme="dark"] .cat-divida { border-left-color: #dc3545 !important; }
+[data-theme="dark"] .cat-outros { border-left-color: #6c757d !important; }
+
+[data-theme="dark"] .alerta-normal { border-left-color: #28a745 !important; }
+[data-theme="dark"] .alerta-atencao { border-left-color: #ffc107 !important; }
+[data-theme="dark"] .alerta-urgente { border-left-color: #dc3545 !important; }
+[data-theme="dark"] .alerta-aviso { border-left-color: #fd7e14 !important; }
+
+[data-theme="dark"] #resumo .card:nth-child(1), [data-theme="dark"] #resumoContas .card:nth-child(1), [data-theme="dark"] #resumoGanhos .card:nth-child(1), [data-theme="dark"] #resumoObjetivos .card:nth-child(1), [data-theme="dark"] #resumoRelatorios .card:nth-child(1) { border-left-color: var(--purple-dark) !important; }
+[data-theme="dark"] #resumo .card:nth-child(2), [data-theme="dark"] #resumoContas .card:nth-child(3), [data-theme="dark"] #resumoGanhos .card:nth-child(2), [data-theme="dark"] #resumoObjetivos .card:nth-child(2), [data-theme="dark"] #resumoRelatorios .card:nth-child(2) { border-left-color: var(--red-danger) !important; } 
+[data-theme="dark"] #resumo .card:nth-child(3), [data-theme="dark"] #resumoContas .card:nth-child(2), [data-theme="dark"] #resumoGanhos .card:nth-child(3), [data-theme="dark"] #resumoObjetivos .card:nth-child(3), [data-theme="dark"] #resumoRelatorios .card:nth-child(3) { border-left-color: var(--green-success) !important; }
+
+/* ==========================================================
+   CORREÇÃO ESPECÍFICA DE CORES NO MODO ESCURO (INTRODUZIDO)
+========================================================== */
+/* Garante que os números e textos com classes de cor NÃO fiquem brancos */
+[data-theme="dark"] .text-success, 
+[data-theme="dark"] h4.text-success, 
+[data-theme="dark"] #relTotalEntradas { 
+    color: var(--green-success) !important; 
+}
+
+[data-theme="dark"] .text-danger, 
+[data-theme="dark"] h4.text-danger, 
+[data-theme="dark"] #relTotalSaidas { 
+    color: var(--red-danger) !important; 
+}
+
+[data-theme="dark"] .text-primary-purple, 
+[data-theme="dark"] h4.text-primary-purple, 
+[data-theme="dark"] #relTotalGuardado { 
+    color: var(--purple-light) !important; 
+}
+
+[data-theme="dark"] .text-warning, 
+[data-theme="dark"] h4.text-warning, 
+[data-theme="dark"] #relTotalInvestido { 
+    color: var(--yellow-attention) !important; 
+}
+
+/* Cores nas Listas de Movimentação do Dark Mode */
+[data-theme="dark"] .mov-item span.text-success { color: var(--green-success) !important; }
+[data-theme="dark"] .mov-item span.text-danger { color: var(--red-danger) !important; }
+[data-theme="dark"] .mov-item span.text-primary-purple { color: var(--purple-light) !important; }
+[data-theme="dark"] .mov-item span.text-warning { color: var(--yellow-attention) !important; }
+
+/* Cores do Bloco de Comparativo no Dark Mode */
+[data-theme="dark"] #boxComparativo .text-success { color: var(--green-success) !important; }
+[data-theme="dark"] #boxComparativo .text-danger { color: var(--red-danger) !important; }
+
+/* Correção do Botão "Exportar Dados (JSON)" na tela de Configurações no Dark Mode */
+[data-theme="dark"] .btn-outline-dark {
+    color: #e9ecef !important;
+    border-color: #e9ecef !important;
+}
+
+[data-theme="dark"] .btn-outline-dark:hover {
+    background-color: #e9ecef !important;
+    color: #121212 !important;
 }

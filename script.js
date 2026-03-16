@@ -9,6 +9,7 @@
     const alertasContainer = document.getElementById("alertas");
     const graficoCtxEl = document.getElementById("graficoGastos");
     const legendaContainer = document.getElementById("legendaCategorias");
+    const resumoObjetivosHome = document.getElementById("resumoObjetivosHome");
     let graficoPizza = null;
 
     function semanaDoMes(d) { return Math.ceil(d.getDate() / 7); }
@@ -51,7 +52,7 @@
     function corAlerta(dias) {
         if (dias <= 0) return "urgente";
         if (dias <= 3) return "aviso";
-        return "normal"; // Verde para o resto do mes atual
+        return "normal"; 
     }
     
     function classeTextoAlerta(dias) {
@@ -63,37 +64,26 @@
     function mensagemAlerta(dias, recorrencia) {
         if (dias < 0) return "Conta vencida, pague imediatamente!";
         if (dias === 0) return "Sua conta vence HOJE!";
-        
-        // Se for uma conta para o ano que vem (Longo Prazo)
-        if (dias > 45) {
-            let tipo = (recorrencia === 'anual') ? 'no próximo ano' : 'nos próximos meses';
-            return `Você só se preocupa com isso ${tipo} (Faltam ${dias} dias)`;
-        }
-        
+        if (dias > 45) return `Você só se preocupa com isso mais para frente (Faltam ${dias} dias)`;
         return `Sua conta vence em ${dias} dia(s)`;
     }
 
     function criarElementoGasto(gasto, isAlerta = false) {
         const li = document.createElement("li");
         const conta = gasto.conta;
-        
         const dataObj = window.parseDataFlex(gasto.data);
         const dataFormat = dataObj ? dataObj.toLocaleDateString('pt-BR') : 'Data não disponível';
 
         let innerHTML = '';
         if (isAlerta) {
             const dias = diasParaVencimento(conta.vencimento);
-            
-            // Se a conta for para daqui a muito tempo (Ex: Trimestral/Anual paga recém), fica cinza
             let cor = corAlerta(dias);
             if (dias > 45) cor = "secondary"; 
 
             const classeTexto = classeTextoAlerta(dias);
             const mensagem = mensagemAlerta(dias, conta.recorrencia);
-            
             const vencimentoObj = window.parseDataFlex(conta.vencimento);
             const vencimentoFormatado = vencimentoObj ? vencimentoObj.toLocaleDateString('pt-BR') : 'Data não disponível';
-
             const numProximaParcela = (conta.parcelaAtual || 0) + 1; 
 
             innerHTML = `
@@ -142,16 +132,13 @@
         const contas = window.obterContas();
         const contasPendentes = contas.filter(c => (c.parcelaAtual || 0) < (c.parcelas || 1));
 
-        // Pega contas vencidas (dias <= 0) OU contas que vencem nos próximos 35 dias
         let contasParaExibir = contasPendentes.filter(c => {
             const dias = diasParaVencimento(c.vencimento);
             return dias !== null && dias <= 35;
         });
 
-        // Se não tiver nada pra pagar esse mês, pega contas mais pra frente (Longo prazo)
         if (contasParaExibir.length === 0 && contasPendentes.length > 0) {
-            contasParaExibir = contasPendentes; // Mostra as anuais/trimestrais do futuro
-            
+            contasParaExibir = contasPendentes; 
             if (alertaMesConcluidoContainer) {
                 alertaMesConcluidoContainer.innerHTML = `
                     <div class="alerta-mes-concluido border-success bg-success bg-opacity-10 text-success shadow-sm mb-4 p-3 rounded d-flex align-items-center justify-content-center">
@@ -211,7 +198,6 @@
             });
         });
 
-        const maxValor = Math.max(...valorPorSemana, 1);
         calendarioSemana.innerHTML = "";
         detalheGastos.innerHTML = "";
         let semanaAtiva = -1;
@@ -221,26 +207,29 @@
             div.className = "semana-card";
             div.setAttribute("data-semana", i + 1);
             div.innerHTML = `Semana ${i + 1}<br/>${window.formatBRL(valorPorSemana[i])}`;
-            const corBaseRoxa = [108, 92, 231];
-            const intensidade = valorPorSemana[i] > 0 ? (0.3 + (valorPorSemana[i] / maxValor) * 0.7) : 0;
-            div.style.backgroundColor = `rgba(${corBaseRoxa.join(',')}, ${intensidade})`;
-            div.style.color = valorPorSemana[i] > 0 ? "#fff" : "#000";
 
             div.addEventListener("click", () => {
                 if (semanaAtiva === i + 1) {
-                    detalheGastos.classList.remove("mostrar");
-                    detalheGastos.innerHTML = "";
-                    semanaAtiva = -1;
-                    document.querySelectorAll(".semana-card").forEach(el => el.classList.remove("semana-ativa"));
-                    return;
+                    detalheGastos.classList.toggle("mostrar"); // Apenas abre ou fecha
+                    return; 
                 }
+                
                 semanaAtiva = i + 1;
                 document.querySelectorAll(".semana-card").forEach(el => el.classList.remove("semana-ativa"));
                 div.classList.add("semana-ativa");
                 renderizarDetalheGastos(i + 1, pagamentosPorSemana[i]);
-                detalheGastos.classList.add("mostrar");
+                detalheGastos.classList.add("mostrar"); // Abre a nova aba clicada
             });
             calendarioSemana.appendChild(div);
+        }
+
+        // MÁGICA ATUALIZADA: Apenas pinta a semana atual e prepara os dados, mas NÃO abre a lista.
+        const semanaAtual = semanaDoMes(new Date());
+        const cardAtual = calendarioSemana.querySelector(`[data-semana="${semanaAtual}"]`);
+        if (cardAtual) {
+            semanaAtiva = semanaAtual; // Informa pro código qual semana está acesa
+            cardAtual.classList.add("semana-ativa"); // Coloca o visual roxinho
+            renderizarDetalheGastos(semanaAtual, pagamentosPorSemana[semanaAtual - 1]); // Prepara os gastos em segredo
         }
     }
 
@@ -268,10 +257,7 @@
 
         graficoPizza = new Chart(graficoCtxEl, {
             type: "pie",
-            data: {
-                labels,
-                datasets: [{ data, backgroundColor: colors, borderColor: "#fff", borderWidth: 2 }]
-            },
+            data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: "#fff", borderWidth: 2 }] },
             options: {
                 responsive: true,
                 plugins: {
@@ -311,13 +297,87 @@
         }
     }
 
+    function atualizarObjetivosHome() {
+        if (!resumoObjetivosHome) return;
+        const objetivos = window.obterObjetivos();
+        if (objetivos.length === 0) {
+            resumoObjetivosHome.innerHTML = `
+                <div class="text-center">
+                    <i class="bi bi-wallet2 text-muted mb-2 d-block" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                    <p class="text-muted mb-0">Você ainda não possui carteira ou objetivos.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let totalGuardado = 0;
+        let totalInvestido = 0;
+
+        objetivos.forEach(obj => {
+            const isInv = obj.tipoRegistro === 'investimento';
+            const acumulado = (obj.depositos || []).reduce((s, d) => s + window.toNumber(d.valor), 0);
+            if(isInv) totalInvestido += acumulado;
+            else totalGuardado += acumulado;
+        });
+
+        resumoObjetivosHome.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center mb-3 bg-light p-3 rounded">
+                <div>
+                    <span class="d-block text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Guardado (Objetivos)</span>
+                    <span class="text-primary-purple fw-bold fs-5">${window.formatBRL(totalGuardado)}</span>
+                </div>
+                <i class="bi bi-piggy-bank fs-2 text-primary-purple opacity-50"></i>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded">
+                <div>
+                    <span class="d-block text-muted text-uppercase fw-bold" style="font-size: 0.75rem;">Investimentos Ativos</span>
+                    <span class="text-warning fw-bold fs-5" style="color: #d39e00 !important;">${window.formatBRL(totalInvestido)}</span>
+                </div>
+                <i class="bi bi-graph-up-arrow fs-2 text-warning opacity-50"></i>
+            </div>
+        `;
+    }
+
     function atualizarHome() {
-        if(elSaldoTotal) elSaldoTotal.textContent = window.formatBRL(window.calcularSaldoTotal());
-        if(elGastoMes) elGastoMes.textContent = window.formatBRL(calcularGastoDoMesSeguro());
-        if(elEntradaMes) elEntradaMes.textContent = window.formatBRL(calcularEntradaDoMesSeguro());
+        const saldoLivre = window.calcularSaldoTotal();
+        const gastoMensal = calcularGastoDoMesSeguro();
+        const entradaMensal = calcularEntradaDoMesSeguro();
+        const limiteOrcamento = window.obterLimite();
+
+        if(elSaldoTotal) elSaldoTotal.textContent = window.formatBRL(saldoLivre);
+        if(elGastoMes) elGastoMes.textContent = window.formatBRL(gastoMensal);
+        if(elEntradaMes) elEntradaMes.textContent = window.formatBRL(entradaMensal);
+        
+        const boxOrcamento = document.getElementById("boxOrcamento");
+        const barraOrcamento = document.getElementById("barraOrcamento");
+        const textoOrcamento = document.getElementById("textoOrcamento");
+
+        if (limiteOrcamento > 0 && boxOrcamento) {
+            boxOrcamento.style.display = "block";
+            let porcentagem = (gastoMensal / limiteOrcamento) * 100;
+            let porcentagemVisual = Math.min(porcentagem, 100);
+            barraOrcamento.style.width = porcentagemVisual + "%";
+
+            if (porcentagem < 75) {
+                barraOrcamento.className = "progress-bar bg-success";
+                textoOrcamento.className = "fw-bold text-success";
+            } else if (porcentagem < 100) {
+                barraOrcamento.className = "progress-bar bg-warning";
+                textoOrcamento.className = "fw-bold text-warning";
+            } else {
+                barraOrcamento.className = "progress-bar bg-danger progress-bar-striped progress-bar-animated";
+                textoOrcamento.className = "fw-bold text-danger";
+            }
+            textoOrcamento.innerText = `${Math.floor(porcentagem)}% de ${window.formatBRL(limiteOrcamento)}`;
+        } else if (boxOrcamento) {
+            boxOrcamento.style.display = "none";
+        }
+
         atualizarCalendarioSemana();
         atualizarAlertas();
         atualizarGraficoGastos();
+        atualizarObjetivosHome(); 
     }
 
     document.addEventListener("DOMContentLoaded", atualizarHome);
