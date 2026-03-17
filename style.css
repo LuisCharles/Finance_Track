@@ -390,13 +390,18 @@ badge { color: #fff; font-size: 0.75rem; text-transform: capitalize; padding: 0.
     line-height: 1.2;
 }
 
-/* Menu Mobile (Headers) */
+/* ==========================================================
+   HEADER MOBILE (Menu e Botão Tema)
+========================================================== */
 @media (max-width: 767px) {
-    .new-header .container { flex-direction: row; align-items: center; }
+    .new-header .container { 
+        flex-direction: row !important; 
+        align-items: center !important; 
+        justify-content: space-between !important; 
+        flex-wrap: nowrap !important;
+    }
     .new-nav-links { display: none !important; }
     .new-header .btn-menu { display: block !important; }
-    .offcanvas-body .nav-link.active-link { color: var(--purple-dark); background-color: transparent; }
-    .offcanvas-body .nav-link.active-link::before { content: "•"; color: var(--purple-dark); font-size: 2rem; line-height: 1rem; margin-right: 0.5rem; }
 }
 
 /* =========================================
@@ -501,7 +506,7 @@ badge { color: #fff; font-size: 0.75rem; text-transform: capitalize; padding: 0.
     color: #ffffff !important; 
 }
 
-/* --- AQUI ESTÁ A SEGUNDA MUDANÇA: Semana Ativa no MODO ESCURO --- */
+/* --- Semana Ativa no MODO ESCURO --- */
 [data-theme="dark"] .semana-card { 
     color: #ffffff !important; 
     border-color: #444 !important; 
@@ -514,12 +519,6 @@ badge { color: #fff; font-size: 0.75rem; text-transform: capitalize; padding: 0.
     color: var(--purple-light) !important; 
 }
 
-/* Correção do fundo branco na lista de gastos do calendário (Detalhes) */
-[data-theme="dark"] .detalhe-gastos { 
-    background-color: var(--card-bg) !important; 
-    border-color: var(--border-light) !important; 
-}
-
 /* Caixas de Texto (Inputs e Selects) */
 [data-theme="dark"] .form-control, 
 [data-theme="dark"] .form-select, 
@@ -528,52 +527,11 @@ badge { color: #fff; font-size: 0.75rem; text-transform: capitalize; padding: 0.
     border-color: #444 !important; 
     color: #ffffff !important; 
 }
-[data-theme="dark"] .form-control::placeholder { color: #888 !important; }
 
-/* Botões Claros */
-[data-theme="dark"] .btn-light { 
-    background-color: #333 !important; 
-    color: #fff !important; 
-    border-color: #444 !important; 
-}
-[data-theme="dark"] .btn-light i { color: #fff !important; }
+/* Barra de rolagem elegante */
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
 
-/* Fundos Auxiliares (como o bg-light) */
-[data-theme="dark"] .bg-white { background-color: var(--card-bg) !important; }
-[data-theme="dark"] .bg-light { background-color: var(--light-grey) !important; }
-
-/* Bordas em geral */
-[data-theme="dark"] .border, [data-theme="dark"] .border-top, [data-theme="dark"] .border-bottom, 
-[data-theme="dark"] .border-end, [data-theme="dark"] .border-start { 
-    border-color: var(--border-light) !important; 
-}
-
-/* Header e Listas de Extrato */
-[data-theme="dark"] .new-header { background-color: var(--card-bg) !important; border-bottom: 1px solid var(--border-light) !important; }
-
-/* Gráficos (Mantém as cores originais, apenas suaviza o brilho para não ofuscar) */
-[data-theme="dark"] canvas { filter: brightness(0.85); }
-
-/* Barra de rolagem (Scrollbar) escura elegante */
-[data-theme="dark"] ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-[data-theme="dark"] ::-webkit-scrollbar-track {
-    background: var(--bg-light);
-    border-radius: 4px;
-}
-[data-theme="dark"] ::-webkit-scrollbar-thumb {
-    background: #444;
-    border-radius: 4px;
-}
-[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-    background: var(--purple-dark); 
-}
-
-/* ==========================================================
-   FORÇAR CORES DAS BORDAS NO MODO ESCURO (SOBREPÕE O CINZA)
-========================================================== */
+/* FORÇAR CORES DAS BORDAS NO MODO ESCURO */
 [data-theme="dark"] .cat-alimentacao { border-left-color: #28a745 !important; }
 [data-theme="dark"] .cat-mercado { border-left-color: #20c997 !important; }
 [data-theme="dark"] .cat-aluguel { border-left-color: #6f42c1 !important; }
@@ -589,116 +547,39 @@ badge { color: #fff; font-size: 0.75rem; text-transform: capitalize; padding: 0.
 [data-theme="dark"] .alerta-urgente { border-left-color: #dc3545 !important; }
 [data-theme="dark"] .alerta-aviso { border-left-color: #fd7e14 !important; }
 
-[data-theme="dark"] #resumo .card:nth-child(1), [data-theme="dark"] #resumoContas .card:nth-child(1), [data-theme="dark"] #resumoGanhos .card:nth-child(1), [data-theme="dark"] #resumoObjetivos .card:nth-child(1), [data-theme="dark"] #resumoRelatorios .card:nth-child(1) { border-left-color: var(--purple-dark) !important; }
-[data-theme="dark"] #resumo .card:nth-child(2), [data-theme="dark"] #resumoContas .card:nth-child(3), [data-theme="dark"] #resumoGanhos .card:nth-child(2), [data-theme="dark"] #resumoObjetivos .card:nth-child(2), [data-theme="dark"] #resumoRelatorios .card:nth-child(2) { border-left-color: var(--red-danger) !important; } 
-[data-theme="dark"] #resumo .card:nth-child(3), [data-theme="dark"] #resumoContas .card:nth-child(2), [data-theme="dark"] #resumoGanhos .card:nth-child(3), [data-theme="dark"] #resumoObjetivos .card:nth-child(3), [data-theme="dark"] #resumoRelatorios .card:nth-child(3) { border-left-color: var(--green-success) !important; }
+[data-theme="dark"] #resumo .card:nth-child(1), [data-theme="dark"] #resumoRelatorios .card:nth-child(1) { border-left-color: var(--purple-dark) !important; }
+[data-theme="dark"] #resumo .card:nth-child(2), [data-theme="dark"] #resumoRelatorios .card:nth-child(2) { border-left-color: var(--red-danger) !important; } 
+[data-theme="dark"] #resumo .card:nth-child(3), [data-theme="dark"] #resumoRelatorios .card:nth-color(3) { border-left-color: var(--green-success) !important; }
 
 /* ==========================================================
-   CORREÇÃO ESPECÍFICA DE CORES NO MODO ESCURO
-========================================================== */
-[data-theme="dark"] .text-success, 
-[data-theme="dark"] h4.text-success, 
-[data-theme="dark"] #relTotalEntradas { 
-    color: var(--green-success) !important; 
-}
-
-[data-theme="dark"] .text-danger, 
-[data-theme="dark"] h4.text-danger, 
-[data-theme="dark"] #relTotalSaidas { 
-    color: var(--red-danger) !important; 
-}
-
-[data-theme="dark"] .text-primary-purple, 
-[data-theme="dark"] h4.text-primary-purple, 
-[data-theme="dark"] #relTotalGuardado { 
-    color: var(--purple-light) !important; 
-}
-
-[data-theme="dark"] .text-warning, 
-[data-theme="dark"] h4.text-warning, 
-[data-theme="dark"] #relTotalInvestido { 
-    color: var(--yellow-attention) !important; 
-}
-
-[data-theme="dark"] .mov-item span.text-success { color: #28a745 !important; }
-[data-theme="dark"] .mov-item span.text-danger { color: #dc3545 !important; }
-[data-theme="dark"] .mov-item span.text-primary-purple { color: #A29BFE !important; }
-[data-theme="dark"] .mov-item span.text-warning { color: #ffc107 !important; }
-
-[data-theme="dark"] #boxComparativo .text-success { color: #28a745 !important; }
-[data-theme="dark"] #boxComparativo .text-danger { color: #dc3545 !important; }
-
-/* ==========================================================
-   CORREÇÕES FINAIS (BOTÃO BACKUP E LAYOUT MOBILE)
+   CORREÇÕES FINAIS (CORES, MOBILE E EXPLORADOR)
 ========================================================== */
 
-/* 1. Botão Exportar Backup (Configurações) apagado no Dark Mode */
-[data-theme="dark"] .btn-outline-dark {
-    color: #e9ecef !important;
-    border-color: #e9ecef !important;
-}
-[data-theme="dark"] .btn-outline-dark:hover {
-    background-color: #e9ecef !important;
-    color: #121212 !important;
-}
-/* Faz o botão ficar visível mesmo quando desativado */
-[data-theme="dark"] .btn-outline-dark:disabled,
-[data-theme="dark"] .btn-outline-dark.disabled {
-    color: #888888 !important;
-    border-color: #555555 !important;
-    opacity: 1 !important;
-}
+/* 1. CORREÇÃO DE CORES VIBRANTES NO DARK MODE */
+[data-theme="dark"] #relTotalEntradas, [data-theme="dark"] .text-success { color: var(--green-success) !important; }
+[data-theme="dark"] #relTotalSaidas, [data-theme="dark"] .text-danger { color: var(--red-danger) !important; }
+[data-theme="dark"] #relTotalGuardado, [data-theme="dark"] .text-primary-purple { color: var(--purple-light) !important; }
+[data-theme="dark"] #relTotalInvestido, [data-theme="dark"] .text-warning { color: var(--yellow-attention) !important; }
 
-/* 2. Limita a altura do Explorador de Ativos e adiciona rolagem */
-#containerResultados {
-    max-height: 45vh;
-    overflow-y: auto;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding-bottom: 10px;
-}
-[data-theme="dark"] #containerResultados .btn-outline-dark {
-    color: #e0e0e0 !important;
-    border-color: #444 !important;
-    background-color: #2b2b2b !important;
-}
-[data-theme="dark"] #containerResultados .btn-outline-dark:hover {
-    background-color: var(--purple-dark) !important;
-    border-color: var(--purple-dark) !important;
-    color: #fff !important;
-}
+/* 2. BOTÃO BACKUP NO DARK MODE */
+[data-theme="dark"] .btn-outline-dark { color: #e9ecef !important; border-color: #e9ecef !important; }
+[data-theme="dark"] .btn-outline-dark:disabled { color: #888 !important; border-color: #555 !important; opacity: 1 !important; }
 
-/* 3. Força a quebra de linha nos filtros do Relatório no Celular */
+/* 3. EXPLORADOR DE ATIVOS (LIMITAR ALTURA) */
+#containerResultados { max-height: 45vh; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* 4. AJUSTE DE QUEBRA DE LINHA NO MOBILE (HOME E RELATÓRIO) */
 @media (max-width: 768px) {
-    /* Força qualquer div pai direta do botão PDF a quebrar linha (sem depender de ID) */
-    div:has(> #btnGerarPDF) {
+    /* Força o conteúdo dos alertas a quebrar para o valor não sair do card */
+    .alerta-header { 
         flex-wrap: wrap !important;
-        width: 100% !important;
+        gap: 5px;
     }
-    
-    /* Faz o botão do PDF ocupar a linha toda de cima */
-    #btnGerarPDF {
-        width: 100% !important;
-        justify-content: center !important;
-        margin-bottom: 10px !important;
-        flex-basis: 100% !important;
-    }
-    
-    /* Oculta os divisores verticais que atrapalham a quebra de linha */
-    #btnGerarPDF + .vr, 
-    .vr.mx-1, 
-    .vr.mx-2 { 
-        display: none !important; 
-    }
-    
-    /* Espreme os selects na linha de baixo para eles não vazarem */
-    #filtroTipo, #filtroMes, #filtroAno {
-        flex: 1 1 30% !important;
-        width: 30% !important;
-        min-width: 0 !important;
-        padding: 0.375rem 0.5rem !important;
-        font-size: 0.8rem !important;
-        margin: 0 !important;
-    }
+    .alerta-title-group { width: 100% !important; }
+    .alerta-valor { width: 100% !important; text-align: left !important; font-size: 1.2rem !important; }
+
+    /* Quebra os filtros do relatório para não vazar a tela */
+    div:has(> #btnGerarPDF) { flex-wrap: wrap !important; }
+    #btnGerarPDF { flex-basis: 100% !important; margin-bottom: 10px !important; }
+    #filtroTipo, #filtroMes, #filtroAno { flex: 1 1 30% !important; min-width: 0 !important; font-size: 0.8rem !important; }
 }
