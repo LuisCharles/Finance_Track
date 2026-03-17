@@ -594,9 +594,8 @@ badge { color: #fff; font-size: 0.75rem; text-transform: capitalize; padding: 0.
 [data-theme="dark"] #resumo .card:nth-child(3), [data-theme="dark"] #resumoContas .card:nth-child(2), [data-theme="dark"] #resumoGanhos .card:nth-child(3), [data-theme="dark"] #resumoObjetivos .card:nth-child(3), [data-theme="dark"] #resumoRelatorios .card:nth-child(3) { border-left-color: var(--green-success) !important; }
 
 /* ==========================================================
-   CORREÇÃO ESPECÍFICA DE CORES NO MODO ESCURO (INTRODUZIDO)
+   CORREÇÃO ESPECÍFICA DE CORES NO MODO ESCURO
 ========================================================== */
-/* Garante que os números e textos com classes de cor NÃO fiquem brancos */
 [data-theme="dark"] .text-success, 
 [data-theme="dark"] h4.text-success, 
 [data-theme="dark"] #relTotalEntradas { 
@@ -621,23 +620,85 @@ badge { color: #fff; font-size: 0.75rem; text-transform: capitalize; padding: 0.
     color: var(--yellow-attention) !important; 
 }
 
-/* Cores nas Listas de Movimentação do Dark Mode */
-[data-theme="dark"] .mov-item span.text-success { color: var(--green-success) !important; }
-[data-theme="dark"] .mov-item span.text-danger { color: var(--red-danger) !important; }
-[data-theme="dark"] .mov-item span.text-primary-purple { color: var(--purple-light) !important; }
-[data-theme="dark"] .mov-item span.text-warning { color: var(--yellow-attention) !important; }
+[data-theme="dark"] .mov-item span.text-success { color: #28a745 !important; }
+[data-theme="dark"] .mov-item span.text-danger { color: #dc3545 !important; }
+[data-theme="dark"] .mov-item span.text-primary-purple { color: #A29BFE !important; }
+[data-theme="dark"] .mov-item span.text-warning { color: #ffc107 !important; }
 
-/* Cores do Bloco de Comparativo no Dark Mode */
-[data-theme="dark"] #boxComparativo .text-success { color: var(--green-success) !important; }
-[data-theme="dark"] #boxComparativo .text-danger { color: var(--red-danger) !important; }
+[data-theme="dark"] #boxComparativo .text-success { color: #28a745 !important; }
+[data-theme="dark"] #boxComparativo .text-danger { color: #dc3545 !important; }
 
-/* Correção do Botão "Exportar Dados (JSON)" na tela de Configurações no Dark Mode */
+/* ==========================================================
+   CORREÇÕES FINAIS (BOTÃO BACKUP E LAYOUT MOBILE)
+========================================================== */
+
+/* 1. Botão Exportar Backup (Configurações) apagado no Dark Mode */
 [data-theme="dark"] .btn-outline-dark {
     color: #e9ecef !important;
     border-color: #e9ecef !important;
 }
-
 [data-theme="dark"] .btn-outline-dark:hover {
     background-color: #e9ecef !important;
     color: #121212 !important;
+}
+/* Faz o botão ficar visível mesmo quando desativado */
+[data-theme="dark"] .btn-outline-dark:disabled,
+[data-theme="dark"] .btn-outline-dark.disabled {
+    color: #888888 !important;
+    border-color: #555555 !important;
+    opacity: 1 !important;
+}
+
+/* 2. Limita a altura do Explorador de Ativos e adiciona rolagem */
+#containerResultados {
+    max-height: 45vh;
+    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 10px;
+}
+[data-theme="dark"] #containerResultados .btn-outline-dark {
+    color: #e0e0e0 !important;
+    border-color: #444 !important;
+    background-color: #2b2b2b !important;
+}
+[data-theme="dark"] #containerResultados .btn-outline-dark:hover {
+    background-color: var(--purple-dark) !important;
+    border-color: var(--purple-dark) !important;
+    color: #fff !important;
+}
+
+/* 3. Força a quebra de linha nos filtros do Relatório no Celular */
+@media (max-width: 768px) {
+    /* Força qualquer div pai direta do botão PDF a quebrar linha (sem depender de ID) */
+    div:has(> #btnGerarPDF) {
+        flex-wrap: wrap !important;
+        width: 100% !important;
+    }
+    
+    /* Faz o botão do PDF ocupar a linha toda de cima */
+    #btnGerarPDF {
+        width: 100% !important;
+        justify-content: center !important;
+        margin-bottom: 10px !important;
+        flex-basis: 100% !important;
+    }
+    
+    /* Oculta os divisores verticais que atrapalham a quebra de linha */
+    #btnGerarPDF + .vr, 
+    .vr.mx-1, 
+    .vr.mx-2 { 
+        display: none !important; 
+    }
+    
+    /* Espreme os selects na linha de baixo para eles não vazarem */
+    #filtroTipo, #filtroMes, #filtroAno {
+        flex: 1 1 30% !important;
+        width: 30% !important;
+        min-width: 0 !important;
+        padding: 0.375rem 0.5rem !important;
+        font-size: 0.8rem !important;
+        margin: 0 !important;
+    }
 }

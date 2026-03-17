@@ -19,9 +19,8 @@
     }
 
     // ==========================================================
-    // SISTEMA DE BACKUP (EXPORTAR / IMPORTAR) - INTRODUZIDO
-    // ==========================================================
-
+    // SISTEMA DE BACKUP (EXPORTAR / IMPORTAR) 
+    // =========================================================
     // 1. Lógica para EXPORTAR os dados (Gera arquivo .json)
     if (btnExportar) {
         btnExportar.addEventListener('click', () => {
@@ -76,7 +75,7 @@
     }
 
     // ==========================================================
-    // LÓGICA ORIGINAL DE LIMITES E RESET - MANTIDA
+    // LÓGICA ORIGINAL DE LIMITES E RESET 
     // ==========================================================
 
     if (formLimite) {

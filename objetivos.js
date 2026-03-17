@@ -30,7 +30,7 @@
     const modalExplorarEl = document.getElementById('modalExplorar');
 
     // ==========================================================
-    // INTEGRAÇÃO COM API DA BOLSA (Brapi) - MELHORADA PARA ERROS
+    // INTEGRAÇÃO COM API DA BOLSA (Brapi) 
     // ==========================================================
     async function buscarDadosBolsa(ticker) {
         if (!ticker) return null;
@@ -53,7 +53,7 @@
     }
 
     // ==========================================================
-    // LÓGICA DO EXPLORADOR (MANTIDA)
+    // LÓGICA DO EXPLORADOR 
     // ==========================================================
     async function atualizarInterfaceExplorador(filtro = "") {
         if (!window.carregarListaTickers) return;
